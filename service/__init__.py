@@ -12,5 +12,6 @@ def index():
     return "Hello World!"
 
 import service.routes.admin
+import service.routes.customer
 
 # Now we can access the configuration variables via app.config["VAR_NAME"].
