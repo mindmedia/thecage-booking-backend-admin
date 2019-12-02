@@ -11,7 +11,6 @@ ma = Marshmallow(app)
 def index():
     return "Hello World!"
 
-import service.routes.route1
-import service.routes.route2
+import service.routes.admin
 
 # Now we can access the configuration variables via app.config["VAR_NAME"].
