@@ -1,6 +1,7 @@
 # app/models.py
 from datetime import datetime
 from service import db, ma
+from marshmallow import fields
 
 
 class Admin(db.Model):
@@ -19,9 +20,16 @@ class Admin(db.Model):
         # self.email = email
 
 
+# class AdminSchema(ma.Schema):
+#     class Meta:
+#         fields = ('id', 'user_id', 'password', 'name', 'role')
+
 class AdminSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'user_id', 'password', 'name', 'role')
+    id = fields.Integer()
+    user_id = fields.String(required=True)
+    name = fields.String(required=True)
+    password = fields.String(required=True)
+    role = fields.String(required=True)
 
 
 admin_schema = AdminSchema()
@@ -157,18 +165,28 @@ class Field(db.Model):
     num_pitches = db.Column(db.Integer, nullable=False)
     colour = db.Column(db.String(7))
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.now, nullable=False)
     custom_timeslots = db.relationship(
         "CustomTimeSlot", backref="field", lazy=True)
     pitches = db.relationship("Pitch", backref="Pitch", lazy=True)
 
-    def __init__(self, name):
+    def __init__(self, name, venue_id, num_pitches, colour, created_at, updated_at):
         self.name = name
+        self.venue_id = venue_id
+        self.num_pitches = num_pitches
+        self.colour = colour
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
 
 class FieldSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'venue_id', 'name', 'num_pitches', 'colour', 'created_at', 'updated_at')
+    id = fields.Integer()
+    name = fields.String(required=True)
+    venue_id = fields.Integer()
+    num_pitches = fields.Integer()
+    colour = fields.String(required=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
 
 field_schema = FieldSchema()
@@ -181,8 +199,9 @@ class Pitch(db.Model):
     field_id = db.Column(db.Integer, db.ForeignKey("Field.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False, unique=True)
 
-    def __init__(self, name):
+    def __init__(self, name, field_id):
         self.name = name
+        self.field_id = field_id
 
 
 class PitchSchema(ma.Schema):
@@ -428,7 +447,7 @@ class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), nullable=False, unique=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.now)
     fields = db.relationship("Field", backref="venue", lazy=True)
     promo_code_valid_locations = db.relationship(
         "PromoCodeValidLocation", backref="venue", lazy=True
@@ -436,14 +455,27 @@ class Venue(db.Model):
 
     def __init__(self, name, created_at, updated_at):
         self.name = name
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        self.fields = []
+        self.promo_code_valid_locations = []
 
 
 class VenueSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'name', 'created_at', 'updated_at')
+    id = fields.Integer()
+    name = fields.String(required=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
 
 venue_schema = VenueSchema()
 venues_schema = VenueSchema(many=True)
+
+class VenueSchema2(ma.Schema):
+    id = fields.Integer()
+    name = fields.String(required=True)
+    fields = fields.List(fields.Nested(FieldSchema(only=("id", "name"))))
+
+
+venue2_schema = VenueSchema2()
+venue2s_schema = VenueSchema2(many=True)
