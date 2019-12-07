@@ -23,5 +23,6 @@ import service.routes.admin
 import service.routes.customer
 import service.routes.venue
 import service.routes.field
+import service.routes.pitch
 
 # Now we can access the configuration variables via app.config["VAR_NAME"].
