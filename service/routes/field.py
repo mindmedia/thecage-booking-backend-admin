@@ -24,7 +24,7 @@ def add_field(Id):
 
 # Get lists of Field
 
-@app.route("/field/", methods=["GET"])
+@app.route("/field", methods=["GET"])
 def get_fields():
     all_fields = Field.query.all()
     result = fields_schema.dump(all_fields)
@@ -35,8 +35,8 @@ def get_fields():
 @app.route("/fields/<venue_id>", methods=["GET"])
 def get_fields_based_on_venue_id(venue_id):
     all_fields = Field.query.filter_by(venue_id=venue_id).all()
-    result = fields_schema.dump(all_fields)
-    return fields_schema.jsonify(result)
+    result = fields3_schema.dump(all_fields)
+    return fields3_schema.jsonify(result)
 
 
 # Get field based on Id
