@@ -19,7 +19,7 @@ def add_pitch(Id):
 
 
 # Get lists of Pitch
-@app.route("/pitch/", methods=["GET"])
+@app.route("/pitch", methods=["GET"])
 def get_pitches():
     all_pitches = Pitch.query.all()
     result = pitches_schema.dump(all_pitches)

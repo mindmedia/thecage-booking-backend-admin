@@ -5,7 +5,7 @@ from datetime import datetime
 from service import db
 
 # Create new Venue
-@app.route("/venue/", methods=['POST'])
+@app.route("/venue", methods=['POST'])
 def add_venue():
     name = request.json["name"]
     created_at = datetime.now()
@@ -19,7 +19,7 @@ def add_venue():
 
 
 # Get lists of Venue
-@app.route("/venue/", methods=["GET"])
+@app.route("/venue", methods=["GET"])
 def get_venues():
     all_venues = Venue.query.all()
     result = venues_schema.dump(all_venues)
@@ -35,7 +35,7 @@ def get_venue(Id):
 # Get venue and field
 
 
-@app.route("/venues/", methods=["GET"])
+@app.route("/venues", methods=["GET"])
 def get_venuess():
     venue = Venue.query.order_by(Venue.id).all()
     results = venue2s_schema.dump(venue)
