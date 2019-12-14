@@ -12,7 +12,7 @@ class Admin(db.Model):
     name = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, user_id, password, name, role):
+    def __init__(self, user_id, password, role):
         self.user_id = user_id
         self.password = password
         self.name = name

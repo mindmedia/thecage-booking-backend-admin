@@ -12,7 +12,7 @@ def add_admin():
     name = request.json["name"]
     role = request.json["role"]
 
-    new_admin = Admin(user_id, password, name, role)
+    new_admin = Admin(user_id, password, role)
 
     db.session.add(new_admin)
     db.session.commit()
