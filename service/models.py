@@ -50,8 +50,10 @@ class Announcement(db.Model):
 
 
 class AnnouncementSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'markdown_string', 'placement', 'updated_at')
+    id = fields.Integer()
+    markdown_string = fields.String(required=True)
+    placement = fields.String(required=True)
+    updated_at = fields.DateTime()
 
 
 announcement_schema = AnnouncementSchema()
@@ -74,8 +76,11 @@ class CustomTimeSlot(db.Model):
 
 
 class CustomTimeSlotSchema(ma.Schema):
-    class Meta:
-        fields = ('start_time', 'field_id', 'duration', 'created_at', 'updated_at')
+    start_time = fields.Time(required=True)
+    field_id = fields.Integer()
+    duration = fields.Integer(required=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
 
 customtimeslot_schema = CustomTimeSlotSchema()
@@ -104,8 +109,11 @@ class Customer(db.Model):
 
 
 class CustomerSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'email', 'password', 'name', 'phone_no')
+    id = fields.Integer()
+    email = fields.String(required=True)
+    name = fields.String(required=True)
+    password = fields.String(required=True)
+    phone_no = fields.String(required=True)
 
 
 customer_schema = CustomerSchema()
@@ -118,15 +126,17 @@ class CustomerOdoo(db.Model):
     customer_id = db.Column(
         db.Integer, db.ForeignKey("Customer.id"), nullable=False)
     odoo_id = db.Column(db.Integer, nullable=False, autoincrement=True)
-    venue = db.Column(db.String(200), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey("Venue.id"), nullable=False)
 
-    def __init__(self, venue):
-        self.venue = venue
+    def __init__(self, venue_id):
+        self.venue_id = venue_id
 
 
 class CustomerOdooSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'customer_id', 'odoo_id', 'venue')
+    id = fields.Integer()
+    customer_id = fields.Integer()
+    odoo_id = fields.Integer()
+    venue_id = fields.Integer()
 
 
 customer_odoo_schema = CustomerOdooSchema()
@@ -149,8 +159,9 @@ class Discount(db.Model):
 
 
 class DiscountSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'discount_type', 'amount')
+    id = fields.Integer()
+    discount_type = fields.String(required=True)
+    amount = fields.Float(required=True)
 
 
 discount_schema = DiscountSchema()
@@ -177,6 +188,8 @@ class Field(db.Model):
         self.colour = colour
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
+        self.pitches = []
+        self.custom_timeslots = []
 
 
 class FieldSchema(ma.Schema):
@@ -193,6 +206,16 @@ field_schema = FieldSchema()
 fields_schema = FieldSchema(many=True)
 
 
+class FieldSchema3(ma.Schema):
+    id = fields.Integer()
+    name = fields.String(required=True)
+    venue_id = fields.Integer()
+    colour = fields.String(required=True)
+    num_pitches = fields.Integer()
+
+
+field3_schema = FieldSchema3()
+fields3_schema = FieldSchema3(many=True)
 class Pitch(db.Model):
     __tablename__ = "Pitch"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -205,14 +228,23 @@ class Pitch(db.Model):
 
 
 class PitchSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'field_id', 'name')
+    id = fields.Integer()
+    name = fields.String(required=True)
+    field_id = fields.Integer()
 
 
 pitch_schema = PitchSchema()
 pitches_schema = PitchSchema(many=True)
 
 
+class FieldSchema2(ma.Schema):
+    id = fields.Integer()
+    name = fields.String(required=True)
+    pitches = fields.List(fields.Nested(PitchSchema(only=("id", "name"))))
+
+
+field2_schema = FieldSchema2()
+fields2_schema = FieldSchema2(many=True)
 class Product(db.Model):
     __tablename__ = "Product"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -230,8 +262,9 @@ class Product(db.Model):
 
 
 class ProductSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'name', 'price')
+    id = fields.Integer()
+    name = fields.String(required=True)
+    price = fields.Float(required=True)
 
 
 product_schema = ProductSchema()
@@ -271,8 +304,15 @@ class PromoCode(db.Model):
 
 
 class PromoCodeSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'discountid', 'code', 'valid_from', 'valid_to', 'usage_limit', 'uses_left', 'created_at', 'updated_at')
+    id = fields.Integer()
+    discount_id = fields.Integer()
+    code = fields.String(required=True)
+    valid_from = fields.DateTime(required=True)
+    valid_to = fields.DateTime(required=True)
+    usage_limit = fields.Integer(required=True)
+    uses_left = fields.Integer(required=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
 
 
 promo_code_schema = PromoCodeSchema()
@@ -293,8 +333,10 @@ class PromoCodeLog(db.Model):
 
 
 class PromoCodeLogSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'promo_code_id', 'customer_id', 'timestamp')
+    id = fields.Integer()
+    promo_code_id = fields.Integer()
+    customer_id = fields.Integer()
+    timestamp = fields.DateTime()
 
 
 promo_code_log_schema = PromoCodeLogSchema()
@@ -314,8 +356,10 @@ class PromoCodeValidLocation(db.Model):
 
 
 class PromoCodeValidLocationSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'promo_code_id', 'venue_id', 'name')
+    id = fields.Integer()
+    promo_code_id = fields.Integer()
+    venue_id = fields.Integer()
+    name = fields.String(required=True)
 
 
 promo_code_valid_location_schema = PromoCodeValidLocationSchema()
@@ -336,8 +380,10 @@ class PromoCodeValidProduct(db.Model):
 
 
 class PromoCodeValidProductSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'promo_code_id', 'product_id', 'name')
+    id = fields.Integer()
+    promo_code_id = fields.Integer()
+    product_id = fields.Integer()
+    name = fields.String(required=True)
 
 
 promo_code_valid_product_schema = PromoCodeValidProductSchema()
@@ -360,8 +406,11 @@ class PromoCodeValidTiming(db.Model):
 
 
 class PromoCodeValidTimingSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'promo_code_id', 'day_of_week', 'start_time', 'end_time')
+    id = fields.Integer()
+    promo_code_id = fields.Integer()
+    day_of_week = fields.String(required=True)
+    start_time = fields.Time(required=True)
+    end_time = fields.Time(required=True)
 
 
 promo_code_valid_timing_schema = PromoCodeValidTimingSchema()
@@ -388,8 +437,13 @@ class PurchaseItem(db.Model):
 
 
 class PurchaseItemSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'purchase_log_id', 'product_id', 'field_id', 'price', 'start_time', 'end_time')
+    id = fields.Integer()
+    purchase_log_id = fields.Integer()
+    product_id = fields.Integer()
+    field_id = fields.Integer()
+    price = fields.Float(required=True)
+    start_time = fields.Time(required=True)
+    end_time = fields.Time(required=True)
 
 
 purchase_item_schema = PurchaseItemSchema()
@@ -410,8 +464,9 @@ class PurchaseLog(db.Model):
 
 
 class PurchaseLogSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'customer_id', 'timestamp')
+    id = fields.Integer()
+    customer_id = fields.Integer()
+    timestamp = fields.DateTime()
 
 
 purchase_log_schema = PurchaseLogSchema()
@@ -434,8 +489,11 @@ class TimingDiscount(db.Model):
 
 
 class TimingDiscountSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'discount_id', 'start_time', 'end_time', 'status')
+    id = fields.Integer()
+    discount_id = fields.Integer()
+    start_time = fields.Time(required=True)
+    end_time = fields.Time(required=True)
+    status = fields.String(required=True)
 
 
 timing_discount_schema = TimingDiscountSchema()
