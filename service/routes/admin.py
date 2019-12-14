@@ -9,7 +9,6 @@ from service import db
 def add_admin():
     user_id = request.json["user_id"]
     password = request.json["password"]
-    name = request.json["name"]
     role = request.json["role"]
 
     new_admin = Admin(user_id, password, role)
@@ -42,13 +41,9 @@ def update_admin(Id):
 
     user_id = request.json["user_id"]
     password = request.json["password"]
-    name = request.json["name"]
-    role = request.json["role"]
 
-    admin.name = name
     admin.user_id = user_id
     admin.password = password
-    admin.role = role
 
     db.session.commit()
 
