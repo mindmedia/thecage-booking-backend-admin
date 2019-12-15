@@ -9,13 +9,11 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-    name = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, user_id, password, name, role):
+    def __init__(self, user_id, password, role):
         self.user_id = user_id
         self.password = password
-        self.name = name
         self.role = role
         # self.email = email
 
@@ -27,7 +25,6 @@ class Admin(db.Model):
 class AdminSchema(ma.Schema):
     id = fields.Integer()
     user_id = fields.String(required=True)
-    name = fields.String(required=True)
     password = fields.String(required=True)
     role = fields.String(required=True)
 
@@ -181,7 +178,7 @@ class Field(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.now, nullable=False)
     custom_timeslots = db.relationship(
         "CustomTimeSlot", backref="field", lazy=True)
-    pitches = db.relationship("Pitch", backref="Pitch", lazy=True)
+    pitches = db.relationship("Pitch", backref="Pitch", lazy=True, cascade="all, delete")
 
     def __init__(self, name, venue_id, num_pitches, colour, created_at, updated_at):
         self.name = name
@@ -218,6 +215,8 @@ class FieldSchema3(ma.Schema):
 
 field3_schema = FieldSchema3()
 fields3_schema = FieldSchema3(many=True)
+
+
 class Pitch(db.Model):
     __tablename__ = "Pitch"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -247,6 +246,8 @@ class FieldSchema2(ma.Schema):
 
 field2_schema = FieldSchema2()
 fields2_schema = FieldSchema2(many=True)
+
+
 class Product(db.Model):
     __tablename__ = "Product"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -508,7 +509,7 @@ class Venue(db.Model):
     name = db.Column(db.String(200), nullable=False, unique=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.now)
-    fields = db.relationship("Field", backref="venue", lazy=True)
+    fields = db.relationship("Field", backref="venue", lazy=True, cascade="all, delete")
     promo_code_valid_locations = db.relationship(
         "PromoCodeValidLocation", backref="venue", lazy=True
     )
@@ -530,6 +531,7 @@ class VenueSchema(ma.Schema):
 
 venue_schema = VenueSchema()
 venues_schema = VenueSchema(many=True)
+
 
 class VenueSchema2(ma.Schema):
     id = fields.Integer()

@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import Venue, Field, field_schema, fields_schema
+from service.models import Venue, Field, field_schema, fields_schema, fields2_schema, fields3_schema, Pitch
 from datetime import datetime
 from service import db
 
@@ -12,6 +12,7 @@ def add_field(Id):
     name = request.json["name"]
     num_pitches = request.json["num_pitches"]
     colour = request.json["colour"]
+    num_pitches = "0"
     created_at = datetime.now()
     updated_at = datetime.now()
     new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at)

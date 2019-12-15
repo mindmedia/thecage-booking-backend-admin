@@ -11,7 +11,7 @@ def add_pitch(Id):
     field_id = field.id
     name = request.json["name"]
     new_pitch = Pitch(name, field_id)
-
+    field.num_pitches += 1
     db.session.add(new_pitch)
     db.session.commit()
 
@@ -19,7 +19,7 @@ def add_pitch(Id):
 
 
 # Get lists of Pitch
-@app.route("/pitch/", methods=["GET"])
+@app.route("/pitch", methods=["GET"])
 def get_pitches():
     all_pitches = Pitch.query.all()
     result = pitches_schema.dump(all_pitches)
@@ -54,9 +54,13 @@ def update_pitch(Id):
     return pitch_schema.jsonify(pitch)
 
 # Delete Pitch
-@app.route("/pitch/<Id>", methods=["DELETE"])
-def delete_pitch(Id):
-    pitch = Pitch.query.get(Id)
+@app.route("/pitch/<field_id>/<pitch_id>", methods=["DELETE"])
+def delete_pitch(field_id, pitch_id):
+    field = Field.query.get(field_id)
+    pitch = Pitch.query.get(pitch_id)
+
+    # field_with_pitch = Field.query(Field.id == pitch.field_id).all()\
+    field.num_pitches -= 1
     db.session.delete(pitch)
     db.session.commit()
 
