@@ -176,7 +176,7 @@ class Field(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.now, nullable=False)
     custom_timeslots = db.relationship(
         "CustomTimeSlot", backref="field", lazy=True)
-    pitches = db.relationship("Pitch", backref="Pitch", lazy=True)
+    pitches = db.relationship("Pitch", backref="Pitch", lazy=True, cascade="all, delete")
 
     def __init__(self, name, venue_id, num_pitches, colour, created_at, updated_at):
         self.name = name
@@ -507,7 +507,7 @@ class Venue(db.Model):
     name = db.Column(db.String(200), nullable=False, unique=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.now)
-    fields = db.relationship("Field", backref="venue", lazy=True)
+    fields = db.relationship("Field", backref="venue", lazy=True, cascade="all, delete")
     promo_code_valid_locations = db.relationship(
         "PromoCodeValidLocation", backref="venue", lazy=True
     )
