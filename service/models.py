@@ -127,6 +127,8 @@ class CustomerOdoo(db.Model):
 
     def __init__(self, venue_id):
         self.venue_id = venue_id
+        self.odoo_id = odoo_id
+        self.customer_id = customer_id
 
 
 class CustomerOdooSchema(ma.Schema):
