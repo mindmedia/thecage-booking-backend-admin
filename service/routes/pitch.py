@@ -38,12 +38,6 @@ def get_pitch_based_on_field_id(field_id):
     result = pitches_schema.dump(all_pitches)
     return pitches_schema.jsonify(result)
 
-# Get pitch based on field id and pitch id
-@app.route("/pitch/<field_id>/<id>", methods=["GET"])
-def get_pitch_based_on_id(field_id, id):
-    all_pitches = Pitch.query.filter_by(field_id=field_id, id=id).all()
-    result = pitches_schema.dump(all_pitches)
-    return pitches_schema.jsonify(result)
 
 # Update a Pitch
 @app.route("/pitch/<Id>", methods=['PUT'])
