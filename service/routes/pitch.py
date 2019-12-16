@@ -25,9 +25,14 @@ def get_pitches():
     result = pitches_schema.dump(all_pitches)
     return jsonify(result)
 
+# Get pitch based on Id
+@app.route("/pitch/<Id>", methods=["GET"])
+def get_pitch_based_on_id(Id):
+    pitch = Pitch.query.get(Id)
+    return pitch_schema.jsonify(pitch)
 
-# Get Pitch based on Field ID
-@app.route("/pitch/<field_id>", methods=["GET"])
+# Get Pitch based on field ID
+@app.route("/pitches/<field_id>", methods=["GET"])
 def get_pitch_based_on_field_id(field_id):
     all_pitches = Pitch.query.filter_by(field_id=field_id).all()
     result = pitches_schema.dump(all_pitches)
@@ -54,13 +59,9 @@ def update_pitch(Id):
     return pitch_schema.jsonify(pitch)
 
 # Delete Pitch
-@app.route("/pitch/<field_id>/<pitch_id>", methods=["DELETE"])
-def delete_pitch(field_id, pitch_id):
-    field = Field.query.get(field_id)
-    pitch = Pitch.query.get(pitch_id)
-
-    # field_with_pitch = Field.query(Field.id == pitch.field_id).all()\
-    field.num_pitches -= 1
+@app.route("/pitch/<Id>", methods=["DELETE"])
+def delete_pitch(Id):
+    pitch = Pitch.query.get(Id)
     db.session.delete(pitch)
     db.session.commit()
 
