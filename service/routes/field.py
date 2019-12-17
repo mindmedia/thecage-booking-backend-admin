@@ -10,15 +10,22 @@ def add_field(Id):
     venue = Venue.query.get(Id)
     venue_id = venue.id
     name = request.json["name"]
-    num_pitches = request.json["num_pitches"]
     colour = request.json["colour"]
-    num_pitches = "0"
+    num_pitches = request.json["num_pitches"]
     created_at = datetime.now()
     updated_at = datetime.now()
-    new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at)
 
+    new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at)
     db.session.add(new_field)
     db.session.commit()
+    if num_pitches > 0:
+        for i in range(num_pitches):
+            field_id = new_field.id
+            pitchname = "Pitch " + str(i+1)
+            new_pitch = Pitch(pitchname, field_id)
+            db.session.add(new_pitch)
+    db.session.commit()
+    
 
     return field_schema.jsonify(new_field)
 
@@ -39,6 +46,13 @@ def get_fields_based_on_venue_id(venue_id):
     result = fields3_schema.dump(all_fields)
     return fields3_schema.jsonify(result)
 
+# Get pitches and fields
+@app.route("/fields", methods=["GET"])
+def get_fieldss():
+    field = Field.query.order_by(Field.id).all()
+    results = fields2_schema.dump(field)
+    return jsonify(results)
+
 
 # Get field based on Id
 @app.route("/field/<Id>", methods=["GET"])
@@ -52,12 +66,10 @@ def update_field(Id):
     field = Field.query.get(Id)
 
     name = request.json["name"]
-    num_pitches = request.json["num_pitches"]
     colour = request.json["colour"]
     updatedat = datetime.now()
 
     field.name = name
-    field.num_pitches = num_pitches
     field.colour = colour
     field.updatedat = updatedat
 
