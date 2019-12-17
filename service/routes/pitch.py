@@ -56,6 +56,9 @@ def update_pitch(Id):
 @app.route("/pitch/<Id>", methods=["DELETE"])
 def delete_pitch(Id):
     pitch = Pitch.query.get(Id)
+    id = pitch.field_id
+    field = Field.query.get(id)
+    field.num_pitches -= 1
     db.session.delete(pitch)
     db.session.commit()
 
