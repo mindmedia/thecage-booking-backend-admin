@@ -253,21 +253,24 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    odoo_id = db.Column(db.Integer, nullable=False)
     promo_code_valid_products = db.relationship(
         "PromoCodeValidProduct", backref="product", lazy=True
     )
     purchase_items = db.relationship(
         "PurchaseItem", backref="product", lazy=True)
 
-    def __init__(self, name, price):
+    def __init__(self, name, price, odoo_id):
         self.name = name
         self.price = price
+        self.odoo_id = odoo_id
 
 
 class ProductSchema(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
     price = fields.Float(required=True)
+    odoo_id = fields.Integer(required=True)
 
 
 product_schema = ProductSchema()
