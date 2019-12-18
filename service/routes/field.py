@@ -18,10 +18,10 @@ def add_field(Id):
     new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at)
     db.session.add(new_field)
     db.session.commit()
-    if num_pitches > 0:
+    if num_pitches >= 1:
         for i in range(num_pitches):
             field_id = new_field.id
-            pitchname = "Pitch " + str(i+1)
+            pitchname = "P" + str(i+1)
             new_pitch = Pitch(pitchname, field_id)
             db.session.add(new_pitch)
     db.session.commit()
