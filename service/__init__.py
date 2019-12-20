@@ -3,8 +3,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 app = Flask(__name__, instance_relative_config=True)
+CORS(app, allow_headers='*')
 app.config.from_object("config")
 app.config.from_pyfile("config.py")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -25,5 +27,6 @@ import service.routes.customer
 import service.routes.venue
 import service.routes.field
 import service.routes.pitch
+import service.routes.announcement
 
 # Now we can access the configuration variables via app.config["VAR_NAME"].

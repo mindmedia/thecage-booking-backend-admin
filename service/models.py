@@ -36,21 +36,24 @@ admins_schema = AdminSchema(many=True)
 class Announcement(db.Model):
     __tablename__ = "Announcement"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    markdown_string = db.Column(db.String(200), nullable=False)
+    html_string = db.Column(db.String(200), nullable=False)
     placement = db.Column(db.String(200), nullable=False)
+    visibility = db.Column(db.Boolean, default=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, markdown_string, placement, updated_at):
-        self.markdown_string = markdown_string
+    def __init__(self, html_string, placement, visibility, updated_at):
+        self.html_string = html_string
         self.placement = placement
+        self.visibility = visibility
         self.updated_at = updated_at
 
 
 class AnnouncementSchema(ma.Schema):
     id = fields.Integer()
-    markdown_string = fields.String(required=True)
+    html_string = fields.String(required=True)
     placement = fields.String(required=True)
-    updated_at = fields.DateTime()
+    visibility = fields.Boolean()
+    # updated_at = fields.DateTime()
 
 
 announcement_schema = AnnouncementSchema()
