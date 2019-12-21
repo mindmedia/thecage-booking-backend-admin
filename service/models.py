@@ -62,14 +62,18 @@ announcements_schema = AnnouncementSchema(many=True)
 
 class CustomTimeSlot(db.Model):
     __tablename__ = "CustomTimeSlot"
-    start_time = db.Column(db.Time, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     field_id = db.Column(db.Integer, db.ForeignKey("Field.id"), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, start_time, duration, created_at, updated_at):
+    def __init__(self, start_time, end_time, field_id, duration, created_at, updated_at):
         self.start_time = start_time
+        self.end_time = end_time
+        self.field_id = field_id
         self.duration = duration
         self.created_at = created_at
         self.updated_at = updated_at
@@ -77,7 +81,7 @@ class CustomTimeSlot(db.Model):
 
 class CustomTimeSlotSchema(ma.Schema):
     start_time = fields.Time(required=True)
-    field_id = fields.Integer()
+    end_time = fields.Time(required=True)
     duration = fields.Integer(required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
