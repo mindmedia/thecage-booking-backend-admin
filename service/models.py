@@ -501,9 +501,10 @@ class TimingDiscount(db.Model):
         "Discount.id"), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(200), nullable=False)
+    status = db.Column(db.Boolean, default=False)
 
-    def __init__(self, start_time, end_time, status):
+    def __init__(self, discount_id, start_time, end_time, status):
+        self.discount_id = discount_id
         self.start_time = start_time
         self.end_time = end_time
         self.status = status
@@ -514,7 +515,7 @@ class TimingDiscountSchema(ma.Schema):
     discount_id = fields.Integer()
     start_time = fields.Time(required=True)
     end_time = fields.Time(required=True)
-    status = fields.String(required=True)
+    status = fields.Boolean()
 
 
 timing_discount_schema = TimingDiscountSchema()
