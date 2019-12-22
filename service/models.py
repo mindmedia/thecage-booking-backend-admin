@@ -37,12 +37,14 @@ class Announcement(db.Model):
     __tablename__ = "Announcement"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     html_string = db.Column(db.String(200), nullable=False)
+    markdown_string = db.Column(db.String(200), nullable=False)
     placement = db.Column(db.String(200), nullable=False)
     visibility = db.Column(db.Boolean, default=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, html_string, placement, visibility, updated_at):
+    def __init__(self, html_string, markdown_string, placement, visibility, updated_at):
         self.html_string = html_string
+        self.markdown_string = markdown_string
         self.placement = placement
         self.visibility = visibility
         self.updated_at = updated_at
@@ -51,6 +53,7 @@ class Announcement(db.Model):
 class AnnouncementSchema(ma.Schema):
     id = fields.Integer()
     html_string = fields.String(required=True)
+    markdown_string = fields.String(required=True)
     placement = fields.String(required=True)
     visibility = fields.Boolean()
     # updated_at = fields.DateTime()
