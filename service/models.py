@@ -158,8 +158,7 @@ class TimingDiscount(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     discount_type = db.Column(db.String(200), nullable=False)
     discount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.Boolean, default=False)
-    promo_codes = db.relationship("PromoCode", backref="timingdiscount", lazy=True)
+    status = db.Column(db.Boolean, default=False)  
 
     def __init__(self, start_time, end_time, discount_type, discount, status):
         self.start_time = start_time
