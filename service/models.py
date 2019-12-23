@@ -158,8 +158,7 @@ class TimingDiscount(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     discount_type = db.Column(db.String(200), nullable=False)
     discount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.Boolean, default=False)
-    promo_codes = db.relationship("PromoCode", backref="timingdiscount", lazy=True)
+    status = db.Column(db.Boolean, default=False)  
 
     def __init__(self, start_time, end_time, discount_type, discount, status):
         self.start_time = start_time
@@ -512,7 +511,7 @@ class Venue(db.Model):
     __tablename__ = "Venue"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), nullable=False, unique=True) # "Kallang05"
-    field_type = db.Column(db.String(200), nullable=False, unique=True) # "5-A-Side" / "7-A-Side"
+    field_type = db.Column(db.String(200), nullable=False) # "5-A-Side" / "7-A-Side"
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False) 
     updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.now)
     # odoo_id = db.Column(db.Integer, nullable=False)
@@ -521,8 +520,9 @@ class Venue(db.Model):
         "PromoCodeValidLocation", backref="venue", lazy=True
     )
 
-    def __init__(self, name, created_at, updated_at):
+    def __init__(self, name, field_type, created_at, updated_at):
         self.name = name
+        self.field_type = field_type
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
         # self.odoo_id = odoo_id
@@ -533,6 +533,7 @@ class Venue(db.Model):
 class VenueSchema(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
+    field_type = fields.String(required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
     # odoo_id = fields.Integer(required=True)

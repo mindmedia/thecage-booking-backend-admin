@@ -8,10 +8,11 @@ from service import db
 @app.route("/venue", methods=['POST'])
 def add_venue():
     name = request.json["name"]
-    odoo_id = request.json["odooId"]
+    field_type = request.json["fieldType"]
+    # odoo_id = request.json["odooId"]
     created_at = datetime.now()
     updated_at = datetime.now()
-    new_venue = Venue(name, created_at, updated_at, odoo_id)
+    new_venue = Venue(name, field_type, created_at, updated_at)
 
     db.session.add(new_venue)
     db.session.commit()

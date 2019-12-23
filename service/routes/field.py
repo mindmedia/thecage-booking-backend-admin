@@ -9,7 +9,7 @@ from service import db
 def add_field(Id):
     venue = Venue.query.get(Id)
     venue_id = venue.id
-    odoo_id = venue.odoo_id
+    odoo_id = request.json["odooId"]
     name = request.json["name"]
     colour = request.json["colour"]
     num_pitches = request.json["numPitches"]
