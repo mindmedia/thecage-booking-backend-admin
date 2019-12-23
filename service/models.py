@@ -135,7 +135,7 @@ class CustomerOdoo(db.Model):
     odoo_id = db.Column(db.Integer, nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey("Venue.id"), nullable=False)
 
-    def __init__(self, venue_id):
+    def __init__(self, venue_id, odoo_id, customer_id):
         self.venue_id = venue_id
         self.odoo_id = odoo_id
         self.customer_id = customer_id
@@ -558,8 +558,8 @@ venues_schema = VenueSchema(many=True)
 class VenueSchema2(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
-    fields = fields.List(fields.Nested(FieldSchema(only=("id", "name"))))
     odoo_id = fields.Integer(required=True)
+    fields = fields.List(fields.Nested(FieldSchema(only=("id", "name"))))
 
 
 venue2_schema = VenueSchema2()

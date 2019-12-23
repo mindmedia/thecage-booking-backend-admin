@@ -48,6 +48,6 @@ def get_announcement():
 
 # Get announcement by Id
 @app.route("/announcement/<Id>", methods=["GET"])
-def get_venue(Id):
+def get_announcement_by_id(Id):
     announcement = Announcement.query.get(Id)
     return announcement_schema.jsonify(announcement)
