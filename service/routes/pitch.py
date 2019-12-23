@@ -10,7 +10,7 @@ def add_pitch(Id):
     field = Field.query.get(Id)
     field_id = field.id
     name = request.json["name"]
-    odoo_id = request.json["odooId"]
+    odoo_id = field.odoo_id
     new_pitch = Pitch(name, field_id, odoo_id)
     field.num_pitches += 1
     db.session.add(new_pitch)
