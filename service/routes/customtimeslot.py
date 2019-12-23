@@ -56,9 +56,12 @@ def get_customtimeslot(field_id):
     result = customtimeslots_schema.dump(all_customtimeslot)
     return jsonify(result)
 
-# # Get lists of Fields based on Venue ID
-# @app.route("/fields/<venue_id>", methods=["GET"])
-# def get_fields_based_on_venue_id(venue_id):
-#     all_fields = Field.query.filter_by(venue_id=venue_id).all()
-#     result = fields3_schema.dump(all_fields)
-#     return fields3_schema.jsonify(result)
+# Delete Custom Timeslot
+@app.route("/customtimeslot/<Id>", methods=["DELETE"])
+def delete_customtimeslot(Id):
+    customtimeslot = CustomTimeSlot.query.get(Id)
+
+    db.session.delete(customtimeslot)
+    db.session.commit()
+
+    return customtimeslot_schema.jsonify(customtimeslot)
