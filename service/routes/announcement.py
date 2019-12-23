@@ -24,9 +24,9 @@ def add_announcement():
 def update_announcement(Id):
     announcement = Announcement.query.get(Id)
 
-    html_string = request.json["html_string"]
+    html_string = request.json["htmlString"]
     placement = request.json["placement"]
-    markdown_string = request.json["markdown_string"]
+    markdown_string = request.json["markdownString"]
     visibility = request.json["visibility"]
     updatedat = datetime.now()
 

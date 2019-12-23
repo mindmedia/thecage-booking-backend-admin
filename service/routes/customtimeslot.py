@@ -9,9 +9,9 @@ from service import db
 def add_customtimeslot(Id):
     field = Field.query.get(Id)
     field_id = field.id
-    start_time = request.json["start_time"]
+    start_time = request.json["startTime"]
     duration = request.json["duration"]
-    end_time = request.json["end_time"]
+    end_time = request.json["endTime"]
     created_at = datetime.now()
     updated_at = datetime.now()
     new_customtimeslot = CustomTimeSlot(start_time, end_time, field_id, duration, created_at, updated_at)
@@ -21,25 +21,6 @@ def add_customtimeslot(Id):
 
     return customtimeslot_schema.jsonify(new_customtimeslot)
 
-# Update customtimeslot
-@app.route("/customtimeslot/<Id>", methods=["PUT"])
-def update_customtimeslot(Id):
-    custometimeslot = CustomTimeSlot.query.get(Id)
-
-    start_time = request.json["start_time"]
-    end_time = request.json["end_time"]
-    duration = request.json["duration"]
-    created_at = datetime.now()
-    updated_at = datetime.now()
-
-    custometimeslot.start_time = start_time
-    custometimeslot.end_time = end_time
-    custometimeslot.duration = duration
-    custometimeslot.created_at = created_at
-    custometimeslot.updated_at = updated_at
-    db.session.commit()
-
-    return customtimeslot_schema.jsonify(custometimeslot)
 
 # Get customtimeslot based on Id
 @app.route("/customtimeslot/<Id>", methods=["GET"])

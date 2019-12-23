@@ -12,7 +12,7 @@ def add_field(Id):
     odoo_id = venue.odoo_id
     name = request.json["name"]
     colour = request.json["colour"]
-    num_pitches = request.json["num_pitches"]
+    num_pitches = request.json["numPitches"]
     created_at = datetime.now()
     updated_at = datetime.now()
 
@@ -27,7 +27,6 @@ def add_field(Id):
             new_pitch = Pitch(pitchname, field_id, pitch_odoo_id)
             db.session.add(new_pitch)
     db.session.commit()
-    
 
     return field_schema.jsonify(new_field)
 
