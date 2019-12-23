@@ -83,6 +83,7 @@ class CustomTimeSlot(db.Model):
 
 
 class CustomTimeSlotSchema(ma.Schema):
+    id = fields.Integer()
     start_time = fields.Time(required=True)
     end_time = fields.Time(required=True)
     duration = fields.Integer(required=True)
