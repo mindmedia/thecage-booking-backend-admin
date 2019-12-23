@@ -10,7 +10,7 @@ def add_venue():
     name = request.json["name"]
     created_at = datetime.now()
     updated_at = datetime.now()
-    new_venue = Venue(name, created_at, updated_at)
+    new_venue = Venue(name, created_at, updated_at, odoo_id)
 
     db.session.add(new_venue)
     db.session.commit()

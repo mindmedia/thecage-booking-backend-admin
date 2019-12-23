@@ -9,20 +9,22 @@ from service import db
 def add_field(Id):
     venue = Venue.query.get(Id)
     venue_id = venue.id
+    odoo_id = venue.odoo_id
     name = request.json["name"]
     colour = request.json["colour"]
     num_pitches = request.json["num_pitches"]
     created_at = datetime.now()
     updated_at = datetime.now()
 
-    new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at)
+    new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at, odoo_id)
     db.session.add(new_field)
     db.session.commit()
-    if num_pitches >= 1:
-        for i in range(num_pitches):
+    if int(num_pitches) >= 1:
+        for i in range(int(num_pitches)):
             field_id = new_field.id
+            pitch_odoo_id = new_field.odoo_id
             pitchname = "P" + str(i+1)
-            new_pitch = Pitch(pitchname, field_id)
+            new_pitch = Pitch(pitchname, field_id, pitch_odoo_id)
             db.session.add(new_pitch)
     db.session.commit()
     
