@@ -24,7 +24,6 @@ def index():
 
 import service.routes.admin
 import service.routes.bookinghistory
-import service.routes.checkout
 import service.routes.customer
 import service.routes.venue
 import service.routes.field
