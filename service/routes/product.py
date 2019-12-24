@@ -10,6 +10,13 @@ def get_products():
     result = products_schema.dump(product)
     return jsonify(result)
 
+# get product based on id
+@app.route("/product/<Id>", methods=['GET'])
+def get_products_by_id(Id):
+    product = Product.query.get(Id)
+    return product_schema.jsonify(product)
+
+
 # create product
 @app.route("/product", methods=['POST'])
 def add_product():
