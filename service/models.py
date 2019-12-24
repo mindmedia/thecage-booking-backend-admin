@@ -223,7 +223,7 @@ class Pitch(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     field_id = db.Column(db.Integer, db.ForeignKey("Field.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
-    odoo_id = db.Column(db.Integer, nullable=False)
+    odoo_id = db.Column(db.Integer)
 
     def __init__(self, name, field_id, odoo_id):
         self.name = name
@@ -235,7 +235,7 @@ class PitchSchema(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
     field_id = fields.Integer()
-    odoo_id = fields.Integer(required=True)
+    odoo_id = fields.Integer()
 
 
 pitch_schema = PitchSchema()
@@ -292,6 +292,7 @@ class PromoCode(db.Model):
     valid_to = db.Column(db.DateTime, default=datetime.now, nullable=False)
     usage_limit = db.Column(db.Integer, nullable=False)
     uses_left = db.Column(db.Integer, nullable=False)
+    usage_per_user = db.Column(db.Integer, nullable=False)
     discount_type = db.Column(db.String(200), nullable=False)
     discount = db.Column(db.Float, nullable=False) 
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
@@ -308,12 +309,13 @@ class PromoCode(db.Model):
         "PromoCodeValidLocation", backref="promocode", lazy=True
     )
 
-    def __init__(self, code, valid_from, valid_to, usage_limit, uses_left, discount_type, discount, created_at, updated_at):
+    def __init__(self, code, valid_from, valid_to, usage_limit, uses_left, usage_per_user, discount_type, discount, created_at, updated_at):
         self.code = code
         self.valid_from = valid_from
         self.valid_to = valid_to
         self.usage_limit = usage_limit
         self.uses_left = uses_left
+        self.usage_per_user = usage_per_user
         self.discount_type = discount_type
         self.discount = discount
         self.created_at = created_at
@@ -328,6 +330,7 @@ class PromoCodeSchema(ma.Schema):
     valid_to = fields.DateTime(required=True)
     usage_limit = fields.Integer(required=True)
     uses_left = fields.Integer(required=True)
+    usage_per_user = fields.Integer(required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
@@ -368,8 +371,10 @@ class PromoCodeValidLocation(db.Model):
     venue_id = db.Column(db.Integer, db.ForeignKey("Venue.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, name):
+    def __init__(self, name, promo_code_id, venue_id):
         self.name = name
+        self.promo_code_id = promo_code_id
+        self.venue_id = venue_id
 
 
 class PromoCodeValidLocationSchema(ma.Schema):
@@ -392,8 +397,10 @@ class PromoCodeValidProduct(db.Model):
         "Product.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, name):
+    def __init__(self, name, promo_code_id, product_id):
         self.name = name
+        self.promo_code_id = promo_code_id
+        self.product_id = product_id
 
 
 class PromoCodeValidProductSchema(ma.Schema):
