@@ -172,7 +172,7 @@ class Field(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.now, nullable=False)
     odoo_id = db.Column(db.Integer, nullable=False)
     custom_timeslots = db.relationship(
-        "CustomTimeSlot", backref="field", lazy=True)
+        "CustomTimeSlot", backref="field", lazy=True, cascade="all, delete")
     pitches = db.relationship("Pitch", backref="Pitch", lazy=True, cascade="all, delete")
 
     def __init__(self, name, venue_id, field_type, num_pitches, colour, created_at, updated_at, odoo_id):
