@@ -63,6 +63,11 @@ announcement_schema = AnnouncementSchema()
 announcements_schema = AnnouncementSchema(many=True)
 
 
+def insert_data(target, connection, **kw):
+    connection.execute(target.insert(), {'id': 1, 'html_string': 'hello', 'markdown_string': 'hello', 'placement': 'Top', 'visibility': False}, {'id': 2, 'html_string': 'hello', 'markdown_string': 'hello', 'placement': 'Bottom', 'visibility': True})
+
+
+event.listen(Announcement.__table__, 'after_create', insert_data)
 class CustomTimeSlot(db.Model):
     __tablename__ = "CustomTimeSlot"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -181,6 +186,11 @@ timingdiscount_schema = TimingDiscountSchema()
 timingdiscounts_schema = TimingDiscountSchema(many=True)
 
 
+def insert_data(target, connection, **kw):
+    connection.execute(target.insert(), {'id': 1, 'start_time': '12:00', 'end_time': '13:00', 'discount_type': 'Percent', 'discount': 20, 'status': True})
+
+
+event.listen(TimingDiscount.__table__, 'after_create', insert_data)
 class Field(db.Model):
     __tablename__ = "Field"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
