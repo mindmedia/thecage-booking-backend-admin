@@ -510,14 +510,6 @@ class PurchaseLogSchema2(ma.Schema):
         "id", "product_id", "field_id", "price", "start_time", "end_time"
         ))))
 
-class PurchaseLogSchema2(ma.Schema):
-    id = fields.Integer()
-    customer_id = fields.Integer()
-    timestamp = fields.DateTime()
-    fields = fields.List(fields.Nested(PurchaseItemSchema(only=(
-        "id", "product_id", "field_id", "price", "start_time", "end_time"
-        ))))
-
 
 purchase_log2_schema = PurchaseLogSchema2()
 purchase_log2s_schema = PurchaseLogSchema2(many=True)
