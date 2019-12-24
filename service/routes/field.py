@@ -11,12 +11,13 @@ def add_field(Id):
     venue_id = venue.id
     odoo_id = request.json["odooId"]
     name = request.json["name"]
+    field_type = request.json["fieldType"]
     colour = request.json["colour"]
     num_pitches = request.json["numPitches"]
     created_at = datetime.now()
     updated_at = datetime.now()
 
-    new_field = Field(name, venue_id, num_pitches, colour, created_at, updated_at, odoo_id)
+    new_field = Field(name, venue_id, field_type, num_pitches, colour, created_at, updated_at, odoo_id)
     db.session.add(new_field)
     db.session.commit()
     if int(num_pitches) >= 1:
@@ -67,10 +68,12 @@ def update_field(Id):
     field = Field.query.get(Id)
 
     name = request.json["name"]
+    field_type = request.json["fieldType"]
     colour = request.json["colour"]
     updatedat = datetime.now()
 
     field.name = name
+    field.field_type = field_type
     field.colour = colour
     field.updatedat = updatedat
 

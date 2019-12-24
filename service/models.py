@@ -165,6 +165,7 @@ class Field(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     venue_id = db.Column(db.Integer, db.ForeignKey("Venue.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False, unique=True)
+    field_type = db.Column(db.String(200), nullable=False) # "5-A-Side" / "7-A-Side"
     num_pitches = db.Column(db.Integer, nullable=False)
     colour = db.Column(db.String(7))
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
@@ -174,9 +175,10 @@ class Field(db.Model):
         "CustomTimeSlot", backref="field", lazy=True)
     pitches = db.relationship("Pitch", backref="Pitch", lazy=True, cascade="all, delete")
 
-    def __init__(self, name, venue_id, num_pitches, colour, created_at, updated_at, odoo_id):
+    def __init__(self, name, venue_id, field_type, num_pitches, colour, created_at, updated_at, odoo_id):
         self.name = name
         self.venue_id = venue_id
+        self.field_type = field_type
         self.num_pitches = num_pitches
         self.colour = colour
         self.created_at = datetime.now()
@@ -190,6 +192,7 @@ class FieldSchema(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
     venue_id = fields.Integer()
+    field_type = fields.String(required=True)
     num_pitches = fields.Integer()
     colour = fields.String(required=True)
     created_at = fields.DateTime()
@@ -205,6 +208,7 @@ class FieldSchema3(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
     venue_id = fields.Integer()
+    field_type = fields.String(required=True)
     colour = fields.String(required=True)
     num_pitches = fields.Integer()
     odoo_id = fields.Integer(required=True)
@@ -542,7 +546,6 @@ class Venue(db.Model):
     __tablename__ = "Venue"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), nullable=False, unique=True) # "Kallang05"
-    field_type = db.Column(db.String(200), nullable=False) # "5-A-Side" / "7-A-Side"
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False) 
     updated_at = db.Column(db.DateTime, nullable=False, onupdate=datetime.now)
     # odoo_id = db.Column(db.Integer, nullable=False)
@@ -551,9 +554,8 @@ class Venue(db.Model):
         "PromoCodeValidLocation", backref="venue", lazy=True
     )
 
-    def __init__(self, name, field_type, created_at, updated_at):
+    def __init__(self, name, created_at, updated_at):
         self.name = name
-        self.field_type = field_type
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
         # self.odoo_id = odoo_id
@@ -564,7 +566,6 @@ class Venue(db.Model):
 class VenueSchema(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
-    field_type = fields.String(required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
     # odoo_id = fields.Integer(required=True)
@@ -577,7 +578,6 @@ venues_schema = VenueSchema(many=True)
 class VenueSchema2(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
-    field_type = fields.String(required=True)
     fields = fields.List(fields.Nested(FieldSchema(only=("id", "name"))))
 
 
