@@ -2,6 +2,7 @@
 from datetime import datetime
 from service import db, ma
 from marshmallow import fields
+from sqlalchemy import event
 
 
 class Admin(db.Model):
@@ -68,6 +69,8 @@ def insert_data(target, connection, **kw):
 
 
 event.listen(Announcement.__table__, 'after_create', insert_data)
+
+
 class CustomTimeSlot(db.Model):
     __tablename__ = "CustomTimeSlot"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -191,6 +194,8 @@ def insert_data(target, connection, **kw):
 
 
 event.listen(TimingDiscount.__table__, 'after_create', insert_data)
+
+
 class Field(db.Model):
     __tablename__ = "Field"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -556,6 +561,7 @@ venues_schema = VenueSchema(many=True)
 class VenueSchema2(ma.Schema):
     id = fields.Integer()
     name = fields.String(required=True)
+    field_type = fields.String(required=True)
     fields = fields.List(fields.Nested(FieldSchema(only=("id", "name"))))
 
 
