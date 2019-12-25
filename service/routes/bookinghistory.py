@@ -5,17 +5,24 @@ from datetime import datetime
 from service import db
 
 
-@app.route("/bookinghistory", methods=["GET"])
-def get_bookinghistory():
-    purchase_log = PurchaseLog.query.order_by(PurchaseLog.timestamp.desc()).all()
-    results_purchase_log = purchase_log2s_schema.dump(purchase_log)
-
-    purchase_item = PurchaseItem.query.order_by(PurchaseItem.id.desc()).all()
-    results_purchase_item = purchase_items_schema.dump(purchase_item)
-
+@app.route("/bookinghistory/<Id>", methods=["GET"])
+def get_bookinghistory(Id):
+    purchase_log_ids = []
     return_dict = {'logs': [], 'items': []}
-    for i in results_purchase_log:
-        return_dict['logs'].append(i)
-    for i in results_purchase_item:
-        return_dict['items'].append(i)
+
+    purchase_log = PurchaseLog.query.order_by(PurchaseLog.timestamp.desc()).filter_by(customer_id=Id).all()
+    results_purchase_log = purchase_log2s_schema.dump(purchase_log)
+    for result in purchase_log:
+        purchase_log_ids.append(result.id)
+        print(result.id)
+
+    for log in results_purchase_log:
+        return_dict['logs'].append(log)
+
+    for log_id in purchase_log_ids:
+        purchase_item = PurchaseItem.query.order_by(PurchaseItem.id.desc()).filter_by(purchase_log_id=log_id).all()
+        results_purchase_item = purchase_items_schema.dump(purchase_item)
+        for i in results_purchase_item:
+            return_dict['items'].append(i)
+
     return (jsonify(return_dict))
