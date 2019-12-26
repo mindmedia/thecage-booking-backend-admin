@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, PromoCodeValidLocation
+from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, PromoCodeValidLocation, PromoCodeValidTiming
 from datetime import datetime
 from service import db
 
@@ -43,7 +43,19 @@ def add_promo_code():
 
     new_valid_location = PromoCodeValidLocation(valid_location, promo_code_id, venue_id)
     db.session.add(new_valid_location)
-    db.session.commit()
+    timing_included = request.json["timingIncluded"]
+    if timing_included is True:
+        day_of_week = request.json["dayOfWeek"]
+        timing = request.json["timing"]
+        for i in timing:
+            promo_code_id = new_promo_code.id
+            start_time = i["startTime"]
+            end_time = i["endTime"]
+            new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
+            db.session.add(new_valid_timing)
+
+        db.session.commit()
+
     return promo_code_schema.jsonify(new_promo_code)
 
 # Get PromotionCodes
