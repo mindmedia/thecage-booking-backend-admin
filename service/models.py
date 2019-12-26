@@ -406,6 +406,8 @@ class PromoCodeSchema(ma.Schema):
     usage_limit = fields.Integer(required=True)
     uses_left = fields.Integer(required=True)
     usage_per_user = fields.Integer(required=True)
+    discount = fields.Integer(required=True)
+    discount_type = fields.String(required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
     promo_code_valid_products = fields.List(fields.Nested(PromoCodeValidProductSchema(only=("id", "name"))))
