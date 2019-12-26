@@ -225,9 +225,10 @@ class Pitch(db.Model):
     name = db.Column(db.String(200), nullable=False)
     odoo_id = db.Column(db.Integer)
 
-    def __init__(self, name, field_id):
+    def __init__(self, name, field_id, odoo_id):
         self.name = name
         self.field_id = field_id
+        self.odoo_id = odoo_id
 
 
 class PitchSchema(ma.Schema):
