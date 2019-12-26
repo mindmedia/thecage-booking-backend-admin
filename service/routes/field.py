@@ -24,7 +24,8 @@ def add_field(Id):
         for i in range(int(num_pitches)):
             field_id = new_field.id
             pitchname = "P" + str(i+1)
-            new_pitch = Pitch(pitchname, field_id)
+            odoo_id = None
+            new_pitch = Pitch(pitchname, field_id, odoo_id)
             db.session.add(new_pitch)
     db.session.commit()
 

@@ -33,6 +33,7 @@ import service.routes.customtimeslot
 import service.routes.discount
 import service.routes.product
 import service.routes.promotioncode
+import service.routes.product
 import service.routes.purchaseitem
 import service.routes.purchaselog
 
