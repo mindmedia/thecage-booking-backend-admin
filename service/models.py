@@ -322,23 +322,6 @@ class PromoCode(db.Model):
         self.updated_at = updated_at
 
 
-class PromoCodeSchema(ma.Schema):
-    id = fields.Integer()
-    discount_id = fields.Integer()
-    code = fields.String(required=True)
-    valid_from = fields.DateTime(required=True)
-    valid_to = fields.DateTime(required=True)
-    usage_limit = fields.Integer(required=True)
-    uses_left = fields.Integer(required=True)
-    usage_per_user = fields.Integer(required=True)
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
-
-
-promo_code_schema = PromoCodeSchema()
-promo_codes_schema = PromoCodeSchema(many=True)
-
-
 class PromoCodeLog(db.Model):
     __tablename__ = "PromoCodeLog"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -414,6 +397,25 @@ promo_code_valid_product_schema = PromoCodeValidProductSchema()
 promo_code_valid_products_schema = PromoCodeValidProductSchema(many=True)
 
 
+class PromoCodeSchema(ma.Schema):
+    id = fields.Integer()
+    discount_id = fields.Integer()
+    code = fields.String(required=True)
+    valid_from = fields.DateTime(required=True)
+    valid_to = fields.DateTime(required=True)
+    usage_limit = fields.Integer(required=True)
+    uses_left = fields.Integer(required=True)
+    usage_per_user = fields.Integer(required=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+    promo_code_valid_products = fields.List(fields.Nested(PromoCodeValidProductSchema(only=("id", "name"))))
+    promo_code_valid_locations = fields.List(fields.Nested(PromoCodeValidLocationSchema(only=("id", "name"))))
+
+
+promo_code_schema = PromoCodeSchema()
+promo_codes_schema = PromoCodeSchema(many=True)
+
+
 class PromoCodeValidTiming(db.Model):
     __tablename__ = "PromoCodeValidTiming"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -423,10 +425,11 @@ class PromoCodeValidTiming(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
 
-    def __init__(self, start_time, end_time, day_of_week):
+    def __init__(self, start_time, end_time, day_of_week, promo_code_id):
         self.start_time = start_time
         self.end_time = end_time
         self.day_of_week = day_of_week
+        self.promo_code_id = promo_code_id
 
 
 class PromoCodeValidTimingSchema(ma.Schema):
