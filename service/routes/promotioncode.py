@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, promo_code_valid_products_schema, PromoCodeValidLocation, PromoCodeValidTiming
+from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, promo_code_valid_products_schema, PromoCodeValidLocation, promo_code_valid_locations_schema, PromoCodeValidTiming
 from datetime import datetime
 from service import db
 
@@ -35,7 +35,7 @@ def add_promo_code():
         new_valid_product = PromoCodeValidProduct(valid_product, promo_code_id, product_id)
         db.session.add(new_valid_product)
         db.session.commit()
-
+        
     valid_locations = request.json["validLocations"]
     for i in valid_locations:
         valid_location = i
@@ -47,6 +47,7 @@ def add_promo_code():
 
         new_valid_location = PromoCodeValidLocation(valid_location, promo_code_id, venue_id)
         db.session.add(new_valid_location)
+        db.session.commit()
     timing_included = request.json["timingIncluded"]
     if timing_included is True:
         valid_timing = request.json["validTiming"]
@@ -102,18 +103,62 @@ def update_promo_code(Id):
     promocode.updated_at = updated_at
 
     db.session.commit()
-
-    valid_product = request.json["validProduct"]
+# updates promocode
+    # valid_products = request.json["validProducts"]
+    # for i in valid_products:
+    #     valid_product = i
+    #     validproduct = PromoCodeValidProduct.query.all()
+    #     result = promo_code_valid_products_schema.dump(validproduct)
+    #     for p in result:
+    #         if p["name"] == valid_product:
+    #             valid_product_id = p["id"]
+    #             promocode_validproduct = PromoCodeValidProduct.query.get(valid_product_id)
+    #             db.session.delete(promocode_validproduct)
+    #             db.session.commit()
     validproduct = PromoCodeValidProduct.query.all()
     result = promo_code_valid_products_schema.dump(validproduct)
-    for p in result:
-        if p["name"] == valid_product:
-            valid_product_id = p["id"]
-    
-    promocode_validproduct = PromoCodeValidProduct.query.get(valid_product_id)
-    promocode_validproduct.name = valid_product
+    for i in result:
+        if i["promo_code_id"] == promocode.id:
+            valid_product_id = i["id"]
+            promocode_validproduct = PromoCodeValidProduct.query.get(valid_product_id)
+            db.session.delete(promocode_validproduct)
+            db.session.commit()
 
+    valid_locations = PromoCodeValidLocation.query.all()
+    result = promo_code_valid_locations_schema.dump(valid_locations)
+    for i in result:
+        if i["promo_code_id"] == promocode.id:
+            valid_location_id = i["id"]
+            promocode_validlocation = PromoCodeValidLocation.query.get(valid_location_id)
+            db.session.delete(promocode_validlocation)
+            db.session.commit()
 
+    promo_code_id = promocode.id
+    valid_products = request.json["validProducts"]
+    for i in valid_products:
+        valid_product = i
+        product = Product.query.all()
+        result = products_schema.dump(product)
+        for p in result:
+            if p["name"] == valid_product:
+                product_id = p["id"]
+
+        new_valid_product = PromoCodeValidProduct(valid_product, promo_code_id, product_id)
+        db.session.add(new_valid_product)
+        db.session.commit()
+
+    valid_locations = request.json["validLocations"]
+    for i in valid_locations:
+        valid_location = i
+        venue = Venue.query.all()
+        result = venues_schema.dump(venue)
+        for p in result:
+            if p["name"] == valid_location:
+                venue_id = p["id"]
+
+        new_valid_location = PromoCodeValidLocation(valid_location, promo_code_id, venue_id)
+        db.session.add(new_valid_location)
+        db.session.commit()
 
     return promo_code_schema.jsonify(promocode)
 
