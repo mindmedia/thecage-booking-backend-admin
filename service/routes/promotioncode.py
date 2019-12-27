@@ -52,7 +52,7 @@ def add_promo_code():
     if timing_included is True:
         valid_timing = request.json["validTiming"]
         for i in valid_timing:
-            day_of_week = i["dayOfWeek"]
+            day_of_week = i["day"]
             timing = i["timing"]
             for i in timing:
                 promo_code_id = new_promo_code.id
