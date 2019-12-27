@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, promo_code_valid_products_schema, PromoCodeValidLocation, promo_code_valid_locations_schema, PromoCodeValidTiming
+from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, promo_code_valid_products_schema, PromoCodeValidLocation, promo_code_valid_locations_schema, PromoCodeValidTiming, promo_code_valid_timings_schema
 from datetime import datetime
 from service import db
 
@@ -35,7 +35,7 @@ def add_promo_code():
         new_valid_product = PromoCodeValidProduct(valid_product, promo_code_id, product_id)
         db.session.add(new_valid_product)
         db.session.commit()
-        
+
     valid_locations = request.json["validLocations"]
     for i in valid_locations:
         valid_location = i
@@ -171,3 +171,11 @@ def delete_promo_code(Id):
     db.session.commit()
 
     return promo_code_schema.jsonify(promocode)
+
+
+# Get ValidTimings based on PromoCodeId
+@app.route("/validtimings/<promo_code_id>", methods=["GET"])
+def get_validtimings_based_on_promocode_id(promo_code_id):
+    allvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id).all()
+    # result = promo_code_valid_timings_schema.dump(allvalidtimings)
+    return promo_code_valid_timings_schema.jsonify(allvalidtimings)
