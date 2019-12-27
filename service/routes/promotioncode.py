@@ -11,14 +11,14 @@ def add_promo_code():
     valid_from = request.json["validFrom"]
     valid_to = request.json["validTo"]
     usage_limit = request.json["usageLimit"]
-    uses_left = request.json["usesLeft"]
+    times_used = 0
     usage_per_user = request.json["usageperUser"]
     discount_type = request.json["discountType"]
     discount = request.json["discount"]
     created_at = datetime.now()
     updated_at = datetime.now()
 
-    new_promo_code = PromoCode(code, valid_from, valid_to, usage_limit, uses_left, usage_per_user, discount_type, discount, created_at, updated_at)
+    new_promo_code = PromoCode(code, valid_from, valid_to, usage_limit, times_used, usage_per_user, discount_type, discount, created_at, updated_at)
     db.session.add(new_promo_code)
     db.session.commit()
 
