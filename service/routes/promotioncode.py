@@ -188,12 +188,12 @@ def update_promo_code(Id):
     return promo_code_schema.jsonify(promocode)
 
 
-# # Delete Promo Code
-# @app.route("/promotioncode/<Id>", methods=["DELETE"])
-# def delete_promo_code(Id):
-#     promocode = PromoCode.query.get(Id)
-#     db.session.delete(promocode)
-#     db.session.commit()
+# Delete Promo Code
+@app.route("/promotioncode/<Id>", methods=["DELETE"])
+def delete_promo_code(Id):
+    promocode = PromoCode.query.get(Id)
+    db.session.delete(promocode)
+    db.session.commit()
 
     return promo_code_schema.jsonify(promocode)
 
