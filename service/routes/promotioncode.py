@@ -86,7 +86,6 @@ def update_promo_code(Id):
     valid_from = request.json["validFrom"]
     valid_to = request.json["validTo"]
     usage_limit = request.json["usageLimit"]
-    uses_left = request.json["usesLeft"]
     usage_per_user = request.json["usageperUser"]
     discount_type = request.json["discountType"]
     discount = request.json["discount"]
@@ -96,25 +95,13 @@ def update_promo_code(Id):
     promocode.valid_from = valid_from
     promocode.valid_to = valid_to
     promocode.usage_limit = usage_limit
-    promocode.uses_left = uses_left
     promocode.usage_per_user = usage_per_user
     promocode.discount_type = discount_type
     promocode.discount = discount
     promocode.updated_at = updated_at
 
     db.session.commit()
-# updates promocode
-    # valid_products = request.json["validProducts"]
-    # for i in valid_products:
-    #     valid_product = i
-    #     validproduct = PromoCodeValidProduct.query.all()
-    #     result = promo_code_valid_products_schema.dump(validproduct)
-    #     for p in result:
-    #         if p["name"] == valid_product:
-    #             valid_product_id = p["id"]
-    #             promocode_validproduct = PromoCodeValidProduct.query.get(valid_product_id)
-    #             db.session.delete(promocode_validproduct)
-    #             db.session.commit()
+
     validproduct = PromoCodeValidProduct.query.all()
     result = promo_code_valid_products_schema.dump(validproduct)
     for i in result:
@@ -131,6 +118,15 @@ def update_promo_code(Id):
             valid_location_id = i["id"]
             promocode_validlocation = PromoCodeValidLocation.query.get(valid_location_id)
             db.session.delete(promocode_validlocation)
+            db.session.commit()
+
+    validtimings = PromoCodeValidTiming.query.all()
+    result = promo_code_valid_timings_schema.dump(validtimings)
+    for i in result:
+        if i["promo_code_id"] == promocode.id:
+            valid_timing_id = i['id']
+            promocode_validtiming = PromoCodeValidTiming.query.get(valid_timing_id)
+            db.session.delete(promocode_validtiming)
             db.session.commit()
 
     promo_code_id = promocode.id
@@ -160,15 +156,30 @@ def update_promo_code(Id):
         db.session.add(new_valid_location)
         db.session.commit()
 
+    timing_included = request.json["timingIncluded"]
+    if timing_included is True:
+        valid_timing = request.json["validTiming"]
+        for i in valid_timing:
+            day_of_week = i["day"]
+            timing = i["timing"]
+            for i in timing:
+                start_time = i["startTime"]
+                end_time = i["endTime"]
+                new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
+                db.session.add(new_valid_timing)
+
+        db.session.commit()
+
+
     return promo_code_schema.jsonify(promocode)
 
 
-# Delete Promo Code
-@app.route("/promotioncode/<Id>", methods=["DELETE"])
-def delete_promo_code(Id):
-    promocode = PromoCode.query.get(Id)
-    db.session.delete(promocode)
-    db.session.commit()
+# # Delete Promo Code
+# @app.route("/promotioncode/<Id>", methods=["DELETE"])
+# def delete_promo_code(Id):
+#     promocode = PromoCode.query.get(Id)
+#     db.session.delete(promocode)
+#     db.session.commit()
 
     return promo_code_schema.jsonify(promocode)
 
