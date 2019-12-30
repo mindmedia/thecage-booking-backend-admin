@@ -2,6 +2,7 @@ from flask import request, jsonify
 from service import app
 from service.models import Announcement, announcement_schema, announcements_schema
 from datetime import datetime
+import json
 from service import db
 
 # Create announcement
@@ -37,7 +38,7 @@ def update_announcement(Id):
     announcement.visibility = visibility
     db.session.commit()
 
-    return announcement_schema.jsonify(announcement)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Get announcement
 @app.route("/announcement", methods=["GET"])

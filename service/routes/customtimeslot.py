@@ -2,6 +2,7 @@ from flask import request, jsonify
 from service import app
 from service.models import CustomTimeSlot, customtimeslot_schema, Field, customtimeslots_schema
 from datetime import datetime
+import json
 from service import db
 
 # Create customtimeslot
@@ -19,7 +20,7 @@ def add_customtimeslot(Id):
     db.session.add(new_customtimeslot)
     db.session.commit()
 
-    return customtimeslot_schema.jsonify(new_customtimeslot)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Get customtimeslot based on Id
@@ -45,4 +46,4 @@ def delete_customtimeslot(Id):
     db.session.delete(customtimeslot)
     db.session.commit()
 
-    return customtimeslot_schema.jsonify(customtimeslot)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})

@@ -1,12 +1,13 @@
 from flask import request, jsonify
 from service import app
 from service.models import Field, Pitch, pitch_schema, pitches_schema
-# from datetime import datetime
+import json
 from service import db
 
 # Create new pitch
 @app.route("/pitch/<Id>", methods=['POST'])
 def add_pitch(Id):
+
     field = Field.query.get(Id)
     field_id = field.id
     name = request.json["name"]
@@ -16,8 +17,7 @@ def add_pitch(Id):
     db.session.add(new_pitch)
     db.session.commit()
 
-    return pitch_schema.jsonify(new_pitch)
-
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Get lists of Pitch
 @app.route("/pitch", methods=["GET"])
@@ -52,7 +52,7 @@ def update_pitch(Id):
 
     db.session.commit()
 
-    return pitch_schema.jsonify(pitch)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Delete Pitch
 @app.route("/pitch/<Id>", methods=["DELETE"])
@@ -64,4 +64,4 @@ def delete_pitch(Id):
     db.session.delete(pitch)
     db.session.commit()
 
-    return pitch_schema.jsonify(pitch)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})

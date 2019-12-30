@@ -19,7 +19,7 @@ def add_venue():
         db.session.commit()
     except exc.IntegrityError:
         return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
-    return venue_schema.jsonify(new_venue)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Get lists of Venue
@@ -52,16 +52,18 @@ def get_venuess():
 # Update a Venue
 @app.route("/venue/<Id>", methods=['PUT'])
 def update_venue(Id):
-    venue = Venue.query.get(Id)
+    try:
+        venue = Venue.query.get(Id)
 
-    name = request.json["name"]
-    updatedat = datetime.now()
-    venue.name = name
-    venue.updateat = updatedat
+        name = request.json["name"]
+        updatedat = datetime.now()
+        venue.name = name
+        venue.updateat = updatedat
 
-    db.session.commit()
-
-    return venue_schema.jsonify(venue)
+        db.session.commit()
+    except exc.IntegrityError:
+        return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Delete Venue
 @app.route("/venue/<Id>", methods=["DELETE"])

@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from service import app
 from service.models import TimingDiscount, timingdiscount_schema, timingdiscounts_schema
+import json
 from service import db
 
 # Create new Timing Discount
@@ -15,7 +16,7 @@ def add_discount():
 
     db.session.add(new_timing_discount)
     db.session.commit()
-    return timingdiscount_schema.jsonify(new_timing_discount)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Edit timing discount
 @app.route("/discount/<Id>", methods=['PUT'])
@@ -34,7 +35,7 @@ def update_discount(Id):
     timingdiscount.status = status
     db.session.commit()
 
-    return timingdiscount_schema.jsonify(timingdiscount)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Get timing discount
