@@ -181,7 +181,7 @@ def get_validtimings_based_on_promocode_id(promo_code_id):
     for x in range(7):
         return_list.append(day_of_week(x, promo_code_id))
     print(return_list)
-    return str(return_list)
+    return jsonify(return_list)
 
 
 def zero(promo_code_id):
