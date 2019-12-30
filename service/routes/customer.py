@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from service import app
 from service.models import Customer, customer_schema, customers_schema
-
+import json
 from service import db
 
 # Create a Customer
@@ -44,13 +44,15 @@ def update_customer(Id):
     name = request.json["name"]
     phone_no = request.json['phoneNo']
 
-    customer.email = email
-    customer.password = password
-    customer.old_password = old_password
-    customer.name = name
-    customer.phone_no = phone_no
-
-    db.session.commit()
+    if password == old_password:
+        customer.email = email
+        customer.password = password
+        customer.old_password = old_password
+        customer.name = name
+        customer.phone_no = phone_no
+        db.session.commit()
+    else:
+        return json.dumps({'message': 'Passwords do not match'}), 200, {'ContentType': 'application/json'}
 
     return customer_schema.jsonify(customer)
 
