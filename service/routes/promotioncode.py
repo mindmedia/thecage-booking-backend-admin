@@ -63,8 +63,8 @@ def add_promo_code():
                     db.session.add(new_valid_timing)
             else:
                 promo_code_id = new_promo_code.id
-                start_time = "00:00"
-                end_time = "23:59"
+                start_time = "00:00:00"
+                end_time = "23:59:59"
                 new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
                 db.session.add(new_valid_timing)
 
