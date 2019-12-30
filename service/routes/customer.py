@@ -10,7 +10,7 @@ def add_customer():
     email = request.json["email"]
     password = request.json["password"]
     name = request.json["name"]
-    phone_no = request.json['phone_no']
+    phone_no = request.json['phoneNo']
 
     new_customer = Customer(email, password, name, phone_no)
 
@@ -40,11 +40,13 @@ def update_customer(Id):
 
     email = request.json["email"]
     password = request.json["password"]
+    old_password = request.json["oldPassword"]
     name = request.json["name"]
-    phone_no = request.json['phone_no']
+    phone_no = request.json['phoneNo']
 
     customer.email = email
     customer.password = password
+    customer.old_password = old_password
     customer.name = name
     customer.phone_no = phone_no
 
