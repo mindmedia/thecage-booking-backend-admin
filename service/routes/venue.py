@@ -2,19 +2,23 @@ from flask import request, jsonify
 from service import app
 from service.models import Venue, venue_schema, venues_schema, venue2s_schema
 from datetime import datetime
+from sqlalchemy import exc
+import json
 from service import db
 
 # Create new Venue
 @app.route("/venue", methods=['POST'])
 def add_venue():
-    name = request.json["name"]
-    created_at = datetime.now()
-    updated_at = datetime.now()
-    new_venue = Venue(name, created_at, updated_at)
+    try:
+        name = request.json["name"]
+        created_at = datetime.now()
+        updated_at = datetime.now()
+        new_venue = Venue(name, created_at, updated_at)
 
-    db.session.add(new_venue)
-    db.session.commit()
-
+        db.session.add(new_venue)
+        db.session.commit()
+    except exc.IntegrityError:
+        return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
     return venue_schema.jsonify(new_venue)
 
 
@@ -22,6 +26,7 @@ def add_venue():
 @app.route("/venue", methods=["GET"])
 def get_venues():
     all_venues = Venue.query.all()
+
     result = venues_schema.dump(all_venues)
     return jsonify(result)
 
