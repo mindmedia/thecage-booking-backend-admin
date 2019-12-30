@@ -1,22 +1,26 @@
 from flask import request, jsonify
 from service import app
 from service.models import Admin, admin_schema, admins_schema
-
+from sqlalchemy import exc
+import json
 from service import db
 
 # Create an Admin
 @app.route("/admin", methods=["POST"])
 def add_admin():
-    user_id = request.json["user_id"]
-    password = request.json["password"]
-    role = request.json["role"]
+    try:
+        user_id = request.json["user_id"]
+        password = request.json["password"]
+        role = request.json["role"]
 
-    new_admin = Admin(user_id, password, role)
+        new_admin = Admin(user_id, password, role)
 
-    db.session.add(new_admin)
-    db.session.commit()
+        db.session.add(new_admin)
+        db.session.commit()
 
-    return admin_schema.jsonify(new_admin)
+    except exc.IntegrityError:
+        return json.dumps({'message': "User Id '" + user_id + "' already exists"}), 400, {'ContentType': 'application/json'}
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Get lists of Admin
@@ -37,17 +41,20 @@ def get_admin(Id):
 # Update an Admin
 @app.route("/admin/<Id>", methods=["PUT"])
 def update_admin(Id):
-    admin = Admin.query.get(Id)
+    try:
+        admin = Admin.query.get(Id)
 
-    user_id = request.json["user_id"]
-    password = request.json["password"]
+        user_id = request.json["user_id"]
+        password = request.json["password"]
 
-    admin.user_id = user_id
-    admin.password = password
+        admin.user_id = user_id
+        admin.password = password
 
-    db.session.commit()
+        db.session.commit()
 
-    return admin_schema.jsonify(admin)
+    except exc.IntegrityError:
+        return json.dumps({'message': "User Id '" + user_id + "' already exists"}), 400, {'ContentType': 'application/json'}
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Delete Admin
@@ -57,4 +64,4 @@ def delete_admin(Id):
     db.session.delete(admin)
     db.session.commit()
 
-    return admin_schema.jsonify(admin)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
