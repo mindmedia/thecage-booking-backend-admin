@@ -224,7 +224,8 @@ def zero(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -242,7 +243,8 @@ def one(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -260,7 +262,8 @@ def two(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -279,7 +282,8 @@ def three(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -297,7 +301,8 @@ def four(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -315,7 +320,8 @@ def five(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
@@ -333,7 +339,8 @@ def six(promo_code_id):
             del validtiming["day_of_week"]
             del validtiming["id"]
             del validtiming["promo_code_id"]
-        return_dict['timing'].append(validtiming)
+        else:
+            return_dict['timing'].append(validtiming)
     return return_dict
 
 
