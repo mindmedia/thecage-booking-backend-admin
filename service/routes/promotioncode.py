@@ -2,75 +2,80 @@ from flask import request, jsonify
 from service import app
 from service.models import promo_code_schema, promo_codes_schema, PromoCode, Product, products_schema, Venue, venues_schema, PromoCodeValidProduct, promo_code_valid_products_schema, PromoCodeValidLocation, promo_code_valid_locations_schema, PromoCodeValidTiming, promo_code_valid_timings_schema
 from datetime import datetime
+from sqlalchemy import exc
+import json
 from service import db
 
 # Create new PromotionCode
 @app.route("/promotioncode", methods=['POST'])
 def add_promo_code():
-    code = request.json["code"]
-    valid_from = request.json["validFrom"]
-    valid_to = request.json["validTo"]
-    usage_limit = request.json["usageLimit"]
-    times_used = 0
-    usage_per_user = request.json["usageperUser"]
-    discount_type = request.json["discountType"]
-    discount = request.json["discount"]
-    created_at = datetime.now()
-    updated_at = datetime.now()
+    try:
+        code = request.json["code"]
+        valid_from = request.json["validFrom"]
+        valid_to = request.json["validTo"]
+        usage_limit = request.json["usageLimit"]
+        times_used = 0
+        usage_per_user = request.json["usageperUser"]
+        discount_type = request.json["discountType"]
+        discount = request.json["discount"]
+        created_at = datetime.now()
+        updated_at = datetime.now()
 
-    new_promo_code = PromoCode(code, valid_from, valid_to, usage_limit, times_used, usage_per_user, discount_type, discount, created_at, updated_at)
-    db.session.add(new_promo_code)
-    db.session.commit()
-
-    promo_code_id = new_promo_code.id
-    valid_products = request.json["validProducts"]
-    for i in valid_products:
-        valid_product = i
-        product = Product.query.all()
-        result = products_schema.dump(product)
-        for p in result:
-            if p["name"] == valid_product:
-                product_id = p["id"]
-
-        new_valid_product = PromoCodeValidProduct(valid_product, promo_code_id, product_id)
-        db.session.add(new_valid_product)
+        new_promo_code = PromoCode(code, valid_from, valid_to, usage_limit, times_used, usage_per_user, discount_type, discount, created_at, updated_at)
+        db.session.add(new_promo_code)
         db.session.commit()
 
-    valid_locations = request.json["validLocations"]
-    for i in valid_locations:
-        valid_location = i
-        venue = Venue.query.all()
-        result = venues_schema.dump(venue)
-        for p in result:
-            if p["name"] == valid_location:
-                venue_id = p["id"]
+        promo_code_id = new_promo_code.id
+        valid_products = request.json["validProducts"]
+        for i in valid_products:
+            valid_product = i
+            product = Product.query.all()
+            result = products_schema.dump(product)
+            for p in result:
+                if p["name"] == valid_product:
+                    product_id = p["id"]
 
-        new_valid_location = PromoCodeValidLocation(valid_location, promo_code_id, venue_id)
-        db.session.add(new_valid_location)
-        db.session.commit()
-    timing_included = request.json["timingIncluded"]
-    if timing_included is True:
-        valid_timing = request.json["validTiming"]
-        for i in valid_timing:
-            day_of_week = i["day"]
-            timing = i["timing"]
-            if len(timing) > 0:
-                for i in timing:
+            new_valid_product = PromoCodeValidProduct(valid_product, promo_code_id, product_id)
+            db.session.add(new_valid_product)
+            db.session.commit()
+
+        valid_locations = request.json["validLocations"]
+        for i in valid_locations:
+            valid_location = i
+            venue = Venue.query.all()
+            result = venues_schema.dump(venue)
+            for p in result:
+                if p["name"] == valid_location:
+                    venue_id = p["id"]
+
+            new_valid_location = PromoCodeValidLocation(valid_location, promo_code_id, venue_id)
+            db.session.add(new_valid_location)
+            db.session.commit()
+        timing_included = request.json["timingIncluded"]
+        if timing_included is True:
+            valid_timing = request.json["validTiming"]
+            for i in valid_timing:
+                day_of_week = i["day"]
+                timing = i["timing"]
+                if len(timing) > 0:
+                    for i in timing:
+                        promo_code_id = new_promo_code.id
+                        start_time = i["startTime"]
+                        end_time = i["endTime"]
+                        new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
+                        db.session.add(new_valid_timing)
+                else:
                     promo_code_id = new_promo_code.id
-                    start_time = i["startTime"]
-                    end_time = i["endTime"]
+                    start_time = "00:00:00"
+                    end_time = "23:59:59"
                     new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
                     db.session.add(new_valid_timing)
-            else:
-                promo_code_id = new_promo_code.id
-                start_time = "00:00:00"
-                end_time = "23:59:59"
-                new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
-                db.session.add(new_valid_timing)
 
-        db.session.commit()
+            db.session.commit()
 
-    return promo_code_schema.jsonify(new_promo_code)
+    except exc.IntegrityError:
+        return json.dumps({'message': "Code '" + code + "' already exists"}), 400, {'ContentType': 'application/json'}
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Get PromotionCodes
 @app.route("/promotioncodes", methods=['GET'])
@@ -167,12 +172,12 @@ def update_promo_code(Id):
     if timing_included is True:
         valid_timing = request.json["validTiming"]
         for i in valid_timing:
-            day_of_week = i["day"]
+            day_of_week = i["day_of_week"]
             timing = i["timing"]
             if len(timing) > 0:
                 for i in timing:
-                    start_time = i["startTime"]
-                    end_time = i["endTime"]
+                    start_time = i["start_time"]
+                    end_time = i["end_time"]
                     new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
                     db.session.add(new_valid_timing)
             else:
@@ -195,7 +200,7 @@ def delete_promo_code(Id):
     db.session.delete(promocode)
     db.session.commit()
 
-    return promo_code_schema.jsonify(promocode)
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
 # Get ValidTimings based on PromoCodeId
