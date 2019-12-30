@@ -187,6 +187,93 @@ def update_promo_code(Id):
 # Get ValidTimings based on PromoCodeId
 @app.route("/validtimings/<promo_code_id>", methods=["GET"])
 def get_validtimings_based_on_promocode_id(promo_code_id):
+    return_list = []
     allvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id).all()
-    # result = promo_code_valid_timings_schema.dump(allvalidtimings)
-    return promo_code_valid_timings_schema.jsonify(allvalidtimings)
+    for x in range(7):
+        return_list.append(day_of_week(x, promo_code_id))
+    print(return_list)
+    return str(return_list)
+
+
+def zero(promo_code_id):
+    return_dict = {'day_of_week':'Monday'}
+    return_dict.setdefault('timing', [])
+    mondayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Monday").all()
+    result_mondayvalidtimings = promo_code_valid_timings_schema.dump(mondayvalidtimings)
+    for validtiming in result_mondayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def one(promo_code_id):
+    return_dict = {'day_of_week':'Tuesday'}
+    return_dict.setdefault('timing', [])
+    tuesdayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Tuesday").all()
+    result_tuesdayvalidtimings = promo_code_valid_timings_schema.dump(tuesdayvalidtimings)
+    for validtiming in result_tuesdayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def two(promo_code_id):
+    return_dict = {'day_of_week':'Wednesday'}
+    return_dict.setdefault('timing', [])
+    wednesdayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Wednesday").all()
+    result_wednesdayvalidtimings = promo_code_valid_timings_schema.dump(wednesdayvalidtimings)
+    for validtiming in result_wednesdayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def three(promo_code_id):
+    return_dict = {'day_of_week':'Thursday'}
+    return_dict.setdefault('timing', [])
+    thursdayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Thursday").all()
+    result_thursdayvalidtimings = promo_code_valid_timings_schema.dump(thursdayvalidtimings)
+    for validtiming in result_thursdayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def four(promo_code_id):
+    return_dict = {'day_of_week':'Friday'}
+    return_dict.setdefault('timing', [])
+    fridayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Friday").all()
+    result_fridayvalidtimings = promo_code_valid_timings_schema.dump(fridayvalidtimings)
+    for validtiming in result_fridayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def five(promo_code_id):
+    return_dict = {'day_of_week':'Saturday'}
+    return_dict.setdefault('timing', [])
+    saturdayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Saturday").all()
+    result_saturdayvalidtimings = promo_code_valid_timings_schema.dump(saturdayvalidtimings)
+    for validtiming in result_saturdayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def six(promo_code_id):
+    return_dict = {'day_of_week':'Sunday'}
+    return_dict.setdefault('timing', [])
+    sundayvalidtimings = PromoCodeValidTiming.query.filter_by(promo_code_id=promo_code_id, day_of_week="Sunday").all()
+    result_sundayvalidtimings = promo_code_valid_timings_schema.dump(sundayvalidtimings)
+    for validtiming in result_sundayvalidtimings:
+        return_dict['timing'].append(validtiming)
+    return return_dict
+
+
+def day_of_week(i, promo_code_id):
+    switcher = {
+        0: zero,
+        1: one,
+        2: two,
+        3: three,
+        4: four,
+        5: five,
+        6: six
+    }
+    func = switcher.get(i, lambda: "Invalid day of week")
+    return func(promo_code_id)
