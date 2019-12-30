@@ -54,10 +54,17 @@ def add_promo_code():
         for i in valid_timing:
             day_of_week = i["day"]
             timing = i["timing"]
-            for i in timing:
+            if len(timing) > 0:
+                for i in timing:
+                    promo_code_id = new_promo_code.id
+                    start_time = i["startTime"]
+                    end_time = i["endTime"]
+                    new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
+                    db.session.add(new_valid_timing)
+            else:
                 promo_code_id = new_promo_code.id
-                start_time = i["startTime"]
-                end_time = i["endTime"]
+                start_time = "00:00"
+                end_time = "23:59"
                 new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
                 db.session.add(new_valid_timing)
 
@@ -162,9 +169,16 @@ def update_promo_code(Id):
         for i in valid_timing:
             day_of_week = i["day"]
             timing = i["timing"]
-            for i in timing:
-                start_time = i["startTime"]
-                end_time = i["endTime"]
+            if len(timing) > 0:
+                for i in timing:
+                    start_time = i["startTime"]
+                    end_time = i["endTime"]
+                    new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
+                    db.session.add(new_valid_timing)
+            else:
+        
+                start_time = "00:00"
+                end_time = "23:59"
                 new_valid_timing = PromoCodeValidTiming(start_time, end_time, day_of_week, promo_code_id)
                 db.session.add(new_valid_timing)
 
