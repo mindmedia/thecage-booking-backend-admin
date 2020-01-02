@@ -34,6 +34,13 @@ admin_schema = AdminSchema()
 admins_schema = AdminSchema(many=True)
 
 
+def insert_data(target, connection, **kw):
+    connection.execute(target.insert(), {'id': 1, 'user_id': 'admin', 'password': 'password', 'role': 'SuperAdmin'})
+
+
+event.listen(Admin.__table__, 'after_create', insert_data)
+
+
 class Announcement(db.Model):
     __tablename__ = "Announcement"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -137,12 +144,23 @@ class CustomerSchema(ma.Schema):
     id = fields.Integer()
     email = fields.String(required=True)
     name = fields.String(required=True)
-    # password = fields.String(required=True)
+    password = fields.String(required=True)
     phone_no = fields.String(required=True)
 
 
 customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
+
+
+class CustomerSchema2(ma.Schema):
+    id = fields.Integer()
+    email = fields.String(required=True)
+    name = fields.String(required=True)
+    phone_no = fields.String(required=True)
+
+
+customer_schema2 = CustomerSchema2()
+customers_schema2 = CustomerSchema2(many=True)
 
 
 class CustomerOdoo(db.Model):
