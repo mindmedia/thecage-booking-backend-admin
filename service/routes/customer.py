@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from service import app
 from service.models import Customer, customer_schema, customers_schema, customer_schema2, customers_schema2
+import bcrypt
 import json
 from service import db
 
@@ -45,9 +46,12 @@ def update_customer(Id):
     phone_no = request.json['phoneNo']
 
     if password == old_password:
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+        password_decoded = hashed_password.decode("utf8")
+
         customer.email = email
-        customer.password = password
-        customer.old_password = old_password
+        customer.password = password_decoded
         customer.name = name
         customer.phone_no = phone_no
         db.session.commit()
