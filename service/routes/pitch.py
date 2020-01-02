@@ -20,7 +20,7 @@ def add_pitch(Id):
     return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 # Get lists of Pitch
-@app.route("/pitch", methods=["GET"])
+@app.route("/pitches", methods=["GET"])
 def get_pitches():
     all_pitches = Pitch.query.all()
     result = pitches_schema.dump(all_pitches)
@@ -31,13 +31,6 @@ def get_pitches():
 def get_pitch_based_on_id(Id):
     pitch = Pitch.query.get(Id)
     return pitch_schema.jsonify(pitch)
-
-# Get Pitch based on field ID
-@app.route("/pitches/<field_id>", methods=["GET"])
-def get_pitch_based_on_field_id(field_id):
-    all_pitches = Pitch.query.filter_by(field_id=field_id).all()
-    result = pitches_schema.dump(all_pitches)
-    return pitches_schema.jsonify(result)
 
 
 # Update a Pitch

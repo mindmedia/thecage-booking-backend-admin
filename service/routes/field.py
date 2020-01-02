@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import Venue, Field, field_schema, fields_schema, fields2_schema, fields3_schema, Pitch
+from service.models import Venue, Field, field_schema, fields_schema, fields2_schema, field2_schema, fields3_schema, Pitch, pitches_schema
 from datetime import datetime
 from sqlalchemy import exc
 import json
@@ -36,23 +36,24 @@ def add_field(Id):
     return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
-# Get lists of Field
+# # Get lists of Field
 
-@app.route("/field", methods=["GET"])
-def get_fields():
-    all_fields = Field.query.all()
-    result = fields_schema.dump(all_fields)
-    return jsonify(result)
+# @app.route("/field", methods=["GET"])
+# def get_fields():
+#     all_fields = Field.query.all()
+#     result = fields_schema.dump(all_fields)
+#     return jsonify(result)
 
 
-# Get lists of Fields based on Venue ID
-@app.route("/fields/<venue_id>", methods=["GET"])
-def get_fields_based_on_venue_id(venue_id):
-    all_fields = Field.query.filter_by(venue_id=venue_id).all()
-    result = fields3_schema.dump(all_fields)
-    return fields3_schema.jsonify(result)
+# # Get field and Pitch based on field ID
+# @app.route("/fields/<field_id>", methods=["GET"])
+# def get_pitch_based_on_field_id(field_id):
+#     all_pitches = Pitch.query.filter_by(field_id=field_id).all()
+#     result = pitches_schema.dump(all_pitches)
+#     return pitches_schema.jsonify(result)
 
-# Get pitches and fields
+
+# Get list of fields
 @app.route("/fields", methods=["GET"])
 def get_fieldss():
     field = Field.query.order_by(Field.id).all()
@@ -64,7 +65,8 @@ def get_fieldss():
 @app.route("/field/<Id>", methods=["GET"])
 def get_fields_based_on_id(Id):
     field = Field.query.get(Id)
-    return field_schema.jsonify(field)
+
+    return field2_schema.jsonify(field)
 
 # Update a Field
 @app.route("/field/<Id>", methods=["PUT"])

@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import Venue, venue_schema, venues_schema, venue2s_schema
+from service.models import Venue, venue_schema, venues_schema, venue2_schema, venue2s_schema, Field, fields3_schema
 from datetime import datetime
 from sqlalchemy import exc
 import json
@@ -22,24 +22,30 @@ def add_venue():
     return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
 
-# Get lists of Venue
-@app.route("/venue", methods=["GET"])
-def get_venues():
-    all_venues = Venue.query.all()
+# # Get lists of Venue
+# @app.route("/venue", methods=["GET"])
+# def get_venues():
+#     all_venues = Venue.query.all()
 
-    result = venues_schema.dump(all_venues)
-    return jsonify(result)
+#     result = venues_schema.dump(all_venues)
+#     return jsonify(result)
 
+
+# Get lists of Fields based on Venue ID
+@app.route("/venues/<venue_id>", methods=["GET"])
+def get_fields_based_on_venue_id(venue_id):
+    all_fields = Field.query.filter_by(venue_id=venue_id).all()
+    result = fields3_schema.dump(all_fields)
+    return fields3_schema.jsonify(result)
 
 # Get Venue based on ID
 @app.route("/venue/<Id>", methods=["GET"])
 def get_venue(Id):
     venue = Venue.query.get(Id)
-    return venue_schema.jsonify(venue)
-
-# Get venue and field
+    return venue2_schema.jsonify(venue)
 
 
+# Get list of venues
 @app.route("/venues", methods=["GET"])
 def get_venuess():
     venue = Venue.query.order_by(Venue.id).all()
