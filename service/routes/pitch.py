@@ -3,6 +3,7 @@ from service import app
 from service.models import Field, Pitch, pitch_schema, pitches_schema
 import json
 from service import db
+import jwt
 
 # Create new pitch
 @app.route("/pitch/<Id>", methods=['POST'])
@@ -12,13 +13,23 @@ def add_pitch(Id):
     field_id = field.id
     name = request.json["name"]
     odoo_id = request.json["odooId"]
-    new_pitch = Pitch(name, field_id, odoo_id)
-    field.num_pitches += 1
-    db.session.add(new_pitch)
-    db.session.commit()
+    tokenstr = request.headers["Authorization"]
 
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        new_pitch = Pitch(name, field_id, odoo_id)
+        field.num_pitches += 1
+        db.session.add(new_pitch)
+        db.session.commit()
 
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 # Get lists of Pitch
 @app.route("/pitches", methods=["GET"])
 def get_pitches():
@@ -40,21 +51,44 @@ def update_pitch(Id):
 
     name = request.json["name"]
     odoo_id = request.json["odooId"]
-    pitch.name = name
-    pitch.odoo_id = odoo_id
+    tokenstr = request.headers["Authorization"]
 
-    db.session.commit()
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        pitch.name = name
+        pitch.odoo_id = odoo_id
 
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+        db.session.commit()
+
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 
 # Delete Pitch
 @app.route("/pitch/<Id>", methods=["DELETE"])
 def delete_pitch(Id):
     pitch = Pitch.query.get(Id)
     id = pitch.field_id
-    field = Field.query.get(id)
-    field.num_pitches -= 1
-    db.session.delete(pitch)
-    db.session.commit()
 
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    tokenstr = request.headers["Authorization"]
+
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        field = Field.query.get(id)
+        field.num_pitches -= 1
+        db.session.delete(pitch)
+        db.session.commit()
+
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
