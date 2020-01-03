@@ -2,6 +2,7 @@ from flask import request, jsonify
 from service.models import Product, products_schema, product_schema
 from service import app
 from service import db
+import jwt
 
 # get products and venues
 @app.route("/products", methods=['GET'])
@@ -25,10 +26,22 @@ def add_product():
     odoo_id = request.json["odooId"]
     start_time = request.json["startTime"]
     end_time = request.json["endTime"]
+    tokenstr = request.headers["Authorization"]
 
-    new_product = Product(name, price, odoo_id, start_time, end_time)
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
 
-    db.session.add(new_product)
-    db.session.commit()
+        new_product = Product(name, price, odoo_id, start_time, end_time)
+
+        db.session.add(new_product)
+        db.session.commit()
+
+    else:
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
     return product_schema.jsonify(new_product)
