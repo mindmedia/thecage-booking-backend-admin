@@ -101,6 +101,6 @@ def delete_venue(Id):
         venue = Venue.query.get(Id)
         db.session.delete(venue)
         db.session.commit()
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
     else:
         return "You are not authorised to perform this action", 400
