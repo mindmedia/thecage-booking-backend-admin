@@ -36,5 +36,6 @@ import service.routes.promotioncode
 import service.routes.product
 import service.routes.purchaseitem
 import service.routes.purchaselog
+import service.routes.signin
 
 # Now we can access the configuration variables via app.config["VAR_NAME"].
