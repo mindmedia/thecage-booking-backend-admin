@@ -3,40 +3,62 @@ from service import app
 from service.models import TimingDiscount, timingdiscount_schema, timingdiscounts_schema
 import json
 from service import db
+import jwt
 
 # Create new Timing Discount
 @app.route("/discount", methods=['POST'])
 def add_discount():
-    start_time = request.json["startTime"]
-    end_time = request.json["endTime"]
-    discount_type = request.json["discountType"]
-    discount = request.json["discount"]
-    status = request.json["status"]
-    new_timing_discount = TimingDiscount(start_time, end_time, discount_type, discount, status)
+    tokenstr = request.headers["Authorization"]
 
-    db.session.add(new_timing_discount)
-    db.session.commit()
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        start_time = request.json["startTime"]
+        end_time = request.json["endTime"]
+        discount_type = request.json["discountType"]
+        discount = request.json["discount"]
+        status = request.json["status"]
+        new_timing_discount = TimingDiscount(start_time, end_time, discount_type, discount, status)
+
+        db.session.add(new_timing_discount)
+        db.session.commit()
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 
 # Edit timing discount
 @app.route("/discount/<Id>", methods=['PUT'])
 def update_discount(Id):
-    timingdiscount = TimingDiscount.query.get(Id)
-    start_time = request.json["startTime"]
-    end_time = request.json["endTime"]
-    discount_type = request.json["discountType"]
-    discount = request.json["discount"]
-    status = request.json["status"]
+    tokenstr = request.headers["Authorization"]
 
-    timingdiscount.start_time = start_time
-    timingdiscount.end_time = end_time
-    timingdiscount.discount_type = discount_type
-    timingdiscount.discount = discount
-    timingdiscount.status = status
-    db.session.commit()
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        timingdiscount = TimingDiscount.query.get(Id)
+        start_time = request.json["startTime"]
+        end_time = request.json["endTime"]
+        discount_type = request.json["discountType"]
+        discount = request.json["discount"]
+        status = request.json["status"]
 
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+        timingdiscount.start_time = start_time
+        timingdiscount.end_time = end_time
+        timingdiscount.discount_type = discount_type
+        timingdiscount.discount = discount
+        timingdiscount.status = status
+        db.session.commit()
 
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 
 # Get timing discount
 @app.route("/discount", methods=["GET"])
