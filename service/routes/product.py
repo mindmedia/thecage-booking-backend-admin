@@ -23,8 +23,10 @@ def add_product():
     name = request.json["name"]
     price = request.json["price"]
     odoo_id = request.json["odooId"]
+    start_time = request.json["startTime"]
+    end_time = request.json["endTime"]
 
-    new_product = Product(name, price, odoo_id)
+    new_product = Product(name, price, odoo_id, start_time, end_time)
 
     db.session.add(new_product)
     db.session.commit()
