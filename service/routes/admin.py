@@ -4,23 +4,32 @@ from service.models import Admin, admin_schema, admins_schema
 from sqlalchemy import exc
 import json
 from service import db
+from parse import parse
+import bcrypt
 
 # Create an Admin
 @app.route("/admin", methods=["POST"])
 def add_admin():
+    req_data = request.get_json()
+
+    user_id = req_data["user_id"]
+    password = req_data["password"]
+    role = "Admin"
     try:
-        user_id = request.json["user_id"]
-        password = request.json["password"]
-        role = request.json["role"]
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+        password = hashed_password.decode("utf8")
 
         new_admin = Admin(user_id, password, role)
 
         db.session.add(new_admin)
         db.session.commit()
 
-    except exc.IntegrityError:
-        return json.dumps({'message': "User Id '" + user_id + "' already exists"}), 400, {'ContentType': 'application/json'}
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    except exc.IntegrityError as e:
+        dupe_field = parse('duplicate key value violates unique constraint "{constraint}"\nDETAIL:  Key ({field})=({input}) already exists.\n', str(e.orig))["field"]
+        print(dupe_field)
+        return json.dumps({'message': f'{dupe_field} already exists'}), 400, {'ContentType': 'application/json'}
+    return admin_schema.jsonify(new_admin)
 
 
 # Get lists of Admin
