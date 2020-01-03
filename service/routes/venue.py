@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from service import app
-from service.models import Venue, venue_schema, venues_schema, venue2_schema, venue2s_schema, Field, fields3_schema
+from service.models import Venue, venue2_schema, venue2s_schema, Field, fields3_schema
 from datetime import datetime
 from sqlalchemy import exc
 import json
@@ -10,12 +10,15 @@ import jwt
 # Create new Venue
 @app.route("/venue", methods=['POST'])
 def add_venue():
-    token = request.headers["token"]
+    tokenstr = request.headers["Authorization"]
 
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+
     if role == "SuperAdmin":
         try:
             name = request.json["name"]
@@ -30,14 +33,6 @@ def add_venue():
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
     else:
         return "You are not authorised to perform this action", 400
-
-# # Get lists of Venue
-# @app.route("/venue", methods=["GET"])
-# def get_venues():
-#     all_venues = Venue.query.all()
-
-#     result = venues_schema.dump(all_venues)
-#     return jsonify(result)
 
 
 # Get lists of Fields based on Venue ID
@@ -60,15 +55,13 @@ def get_venuess():
     venue = Venue.query.order_by(Venue.id).all()
     results = venue2s_schema.dump(venue)
     return jsonify(results)
-    # venue_fields = Venue.query.join(Field, Venue.id == Field.venue_id).add_column().all()
-    # # result = venue2s_schema().dump(venue_fields)
-    # # return jsonify(result)
-    # return venue_fields
+
+
 # Update a Venue
 @app.route("/venue/<Id>", methods=['PUT'])
 def update_venue(Id):
-    token = request.headers["token"]
-
+    token = request.headers["Authorization"]
+    print(token)
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
@@ -88,6 +81,7 @@ def update_venue(Id):
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
     else:
         return "You are not authorised to perform this action", 400
+
 # Delete Venue
 @app.route("/venue/<Id>", methods=["DELETE"])
 def delete_venue(Id):
