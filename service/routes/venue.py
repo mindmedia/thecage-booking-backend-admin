@@ -60,11 +60,13 @@ def get_venuess():
 # Update a Venue
 @app.route("/venue/<Id>", methods=['PUT'])
 def update_venue(Id):
-    token = request.headers["Authorization"]
-    print(token)
+    tokenstr = request.headers["Authorization"]
+
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
         try:
@@ -85,11 +87,13 @@ def update_venue(Id):
 # Delete Venue
 @app.route("/venue/<Id>", methods=["DELETE"])
 def delete_venue(Id):
-    token = request.headers["token"]
+    tokenstr = request.headers["Authorization"]
 
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
         venue = Venue.query.get(Id)
