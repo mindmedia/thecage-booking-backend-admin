@@ -14,7 +14,7 @@ def add_admin():
 
     user_id = req_data["user_id"]
     password = req_data["password"]
-    role = "Admin"
+    role = "SuperAdmin"
     try:
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)

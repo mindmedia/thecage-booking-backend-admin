@@ -27,16 +27,18 @@ def signin():
     for p in result:
         if p["user_id"] == login_id:
             hashed_password = p["password"]
+            role = p["role"]
             id = p["id"]
             if bcrypt.checkpw(
                 login_password.encode("utf-8"), hashed_password.encode("utf-8")
             ):
-                token = jwt.encode({"customer_id": id}, key, algorithm="HS256")
+                token = jwt.encode({"role": role}, key, algorithm="HS256")
                 stringtoken = token.decode("utf-8")
                 return {
                     "userId": id,
                     "user": login_id,
-                    "token": stringtoken
+                    "token": stringtoken,
+                    "role": role
                 }
             else:
                 return "Login Failed", 400

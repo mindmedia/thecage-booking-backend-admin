@@ -5,22 +5,31 @@ from datetime import datetime
 from sqlalchemy import exc
 import json
 from service import db
+import jwt
 
 # Create new Venue
 @app.route("/venue", methods=['POST'])
 def add_venue():
-    try:
-        name = request.json["name"]
-        created_at = datetime.now()
-        updated_at = datetime.now()
-        new_venue = Venue(name, created_at, updated_at)
+    token = request.headers["token"]
 
-        db.session.add(new_venue)
-        db.session.commit()
-    except exc.IntegrityError:
-        return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        try:
+            name = request.json["name"]
+            created_at = datetime.now()
+            updated_at = datetime.now()
+            new_venue = Venue(name, created_at, updated_at)
 
+            db.session.add(new_venue)
+            db.session.commit()
+        except exc.IntegrityError:
+            return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 
 # # Get lists of Venue
 # @app.route("/venue", methods=["GET"])
@@ -58,24 +67,40 @@ def get_venuess():
 # Update a Venue
 @app.route("/venue/<Id>", methods=['PUT'])
 def update_venue(Id):
-    try:
-        venue = Venue.query.get(Id)
+    token = request.headers["token"]
 
-        name = request.json["name"]
-        updatedat = datetime.now()
-        venue.name = name
-        venue.updateat = updatedat
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        try:
+            venue = Venue.query.get(Id)
 
-        db.session.commit()
-    except exc.IntegrityError:
-        return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
-    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+            name = request.json["name"]
+            updatedat = datetime.now()
+            venue.name = name
+            venue.updateat = updatedat
 
+            db.session.commit()
+        except exc.IntegrityError:
+            return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
 # Delete Venue
 @app.route("/venue/<Id>", methods=["DELETE"])
 def delete_venue(Id):
-    venue = Venue.query.get(Id)
-    db.session.delete(venue)
-    db.session.commit()
+    token = request.headers["token"]
 
-    return venue_schema.jsonify(venue)
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        venue = Venue.query.get(Id)
+        db.session.delete(venue)
+        db.session.commit()
+    return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
