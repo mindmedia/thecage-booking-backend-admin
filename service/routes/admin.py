@@ -14,7 +14,7 @@ def add_admin():
 
     user_id = req_data["user_id"]
     password = req_data["password"]
-    role = "SuperAdmin"
+    role = "Admin"
     try:
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
@@ -35,7 +35,7 @@ def add_admin():
 # Get lists of Admin
 @app.route("/admin", methods=["GET"])
 def get_admins():
-    all_admins = Admin.query.all()
+    all_admins = Admin.query.filter(Admin.role == "Admin").all()
     result = admins_schema.dump(all_admins)
     return jsonify(result)
 
