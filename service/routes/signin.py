@@ -32,7 +32,7 @@ def signin():
             if bcrypt.checkpw(
                 login_password.encode("utf-8"), hashed_password.encode("utf-8")
             ):
-                token = jwt.encode({"role": role}, key, algorithm="HS256")
+                token = jwt.encode({"role": role, "id": id}, key, algorithm="HS256")
                 stringtoken = token.decode("utf-8")
                 return {
                     "userId": id,
