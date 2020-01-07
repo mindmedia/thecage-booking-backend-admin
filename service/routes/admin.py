@@ -75,7 +75,7 @@ def account_settings():
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     user_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
     admin = Admin.query.get(user_id)
-    if admin.password == old_password:
+    if bcrypt.checkpw(admin.password.encode("utf-8"), old_password.encode("utf-8")):
         try:
             admin.user_id = user_id
             admin.password = password
