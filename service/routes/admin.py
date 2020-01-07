@@ -108,8 +108,11 @@ def update_admin(Id):
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
         try:
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+            hashed_password_decode = hashed_password.decode("utf8")
             admin.user_id = user_id
-            admin.password = password
+            admin.password = hashed_password_decode
 
             db.session.commit()
         except exc.IntegrityError:
