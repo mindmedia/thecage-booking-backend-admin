@@ -73,12 +73,15 @@ def account_settings():
     tokenstr = tokenstr.split(" ")
     token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
-    user_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
-    admin = Admin.query.get(user_id)
-    if bcrypt.checkpw(admin.password.encode("utf-8"), old_password.encode("utf-8")):
+    admin_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
+    admin = Admin.query.get(admin_id)
+    if bcrypt.checkpw(old_password.encode("utf-8"), admin.password.encode("utf-8")):
         try:
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+            hashed_password_decode = hashed_password.decode("utf8")
             admin.user_id = user_id
-            admin.password = password
+            admin.password = hashed_password_decode
 
             db.session.commit()
         except exc.IntegrityError:
