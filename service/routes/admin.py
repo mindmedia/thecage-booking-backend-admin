@@ -61,7 +61,6 @@ def get_admin(Id):
 # Update own account
 @app.route("/accountsettings", methods=["PUT"])
 def account_settings():
-    admin = Admin.query.get()
 
     user_id = request.json["userId"]
     password = request.json["password"]
@@ -74,11 +73,15 @@ def account_settings():
     tokenstr = tokenstr.split(" ")
     token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
-    user_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
-    if admin.password == old_password:
+    admin_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
+    admin = Admin.query.get(admin_id)
+    if bcrypt.checkpw(old_password.encode("utf-8"), admin.password.encode("utf-8")):
         try:
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+            hashed_password_decode = hashed_password.decode("utf8")
             admin.user_id = user_id
-            admin.password = password
+            admin.password = hashed_password_decode
 
             db.session.commit()
         except exc.IntegrityError:
@@ -105,8 +108,11 @@ def update_admin(Id):
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
         try:
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
+            hashed_password_decode = hashed_password.decode("utf8")
             admin.user_id = user_id
-            admin.password = password
+            admin.password = hashed_password_decode
 
             db.session.commit()
         except exc.IntegrityError:
