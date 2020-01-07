@@ -61,7 +61,6 @@ def get_admin(Id):
 # Update own account
 @app.route("/accountsettings", methods=["PUT"])
 def account_settings():
-    admin = Admin.query.get()
 
     user_id = request.json["userId"]
     password = request.json["password"]
@@ -75,6 +74,7 @@ def account_settings():
     token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     user_id = jwt.decode(token, key, algorithms=['HS256'])["id"]
+    admin = Admin.query.get(user_id)
     if admin.password == old_password:
         try:
             admin.user_id = user_id
