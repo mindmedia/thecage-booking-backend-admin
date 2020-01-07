@@ -136,6 +136,19 @@ cart_item_schema = CartItemSchema()
 cart_items_schema = CartItemSchema(many=True)
 
 
+class CartItemSchema2(ma.Schema):
+    id = fields.Integer()
+    venue_id = fields.Integer(required=True)
+    field_id = fields.Integer(required=True)
+    pitch_id = fields.Integer(required=True)
+    start_time = fields.DateTime(required=True)
+    end_time = fields.DateTime(required=True)
+
+
+cart_item2_schema = CartItemSchema2()
+cart_item2s_schema = CartItemSchema2(many=True)
+
+
 class CustomTimeSlot(db.Model):
     __tablename__ = "CustomTimeSlot"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -343,8 +356,8 @@ class Product(db.Model):
     name = db.Column(db.String(200), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     odoo_id = db.Column(db.Integer, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     promo_code_valid_products = db.relationship(
         "PromoCodeValidProduct", backref="product", lazy=True, cascade="all, delete"
     )
