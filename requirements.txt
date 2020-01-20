@@ -5,3 +5,4 @@ marshmallow-sqlalchemy
 flask_cors
 bcrypt
 parse
+jwt
