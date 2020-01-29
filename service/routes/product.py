@@ -2,6 +2,8 @@ from flask import request, jsonify
 from service.models import Product, products_schema, product_schema
 from service import app
 from service import db
+from sqlalchemy import exc
+import json
 import jwt
 
 # get products and venues
@@ -45,3 +47,56 @@ def add_product():
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
 
     return product_schema.jsonify(new_product)
+
+# update product
+@app.route("/product/<Id>", methods=['PUT'])
+def update_product(Id):
+    tokenstr = request.headers["Authorization"]
+
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        try:
+            product = Product.query.get(Id)
+
+            name = request.json["name"]
+            price = request.json["price"]
+            odoo_id = request.json["odooId"]
+            start_time = request.json["startTime"]
+            end_time = request.json["endTime"]
+
+            product.name = name
+            product.price = price
+            product.odoo_id = odoo_id
+            product.start_time = start_time
+            product.end_time = end_time
+
+            db.session.commit()
+        except exc.IntegrityError:
+            return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
+
+# delete product
+@app.route("/product/<Id>", methods=["DELETE"])
+def delete_product(Id):
+    tokenstr = request.headers["Authorization"]
+
+    file = open("instance/key.key", "rb")
+    key = file.read()
+    file.close()
+    tokenstr = tokenstr.split(" ")
+    token = tokenstr[1]
+    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+    if role == "SuperAdmin":
+        product = Product.query.get(Id)
+        db.session.delete(product)
+        db.session.commit()
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    else:
+        return "You are not authorised to perform this action", 400
