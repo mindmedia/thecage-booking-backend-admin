@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from service.models import Product, products_schema, product_schema
+from service.models import Product, products_schema, product_schema, ProductValidDay
 from service import app
 from service import db
 from sqlalchemy import exc
@@ -29,7 +29,7 @@ def add_product():
     start_time = request.json["startTime"]
     end_time = request.json["endTime"]
     tokenstr = request.headers["Authorization"]
-
+    valid_days = request.json["validDay"]
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
@@ -42,6 +42,16 @@ def add_product():
 
         db.session.add(new_product)
         db.session.commit()
+
+        for i in valid_days:
+            day_of_week = i
+            product_id = new_product.id
+
+            new_valid_day = ProductValidDay(product_id, day_of_week)
+            db.session.add(new_valid_day)
+            db.session.commit()
+            
+
 
     else:
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
