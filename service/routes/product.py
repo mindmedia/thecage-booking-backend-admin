@@ -5,6 +5,9 @@ from service import db
 from sqlalchemy import exc
 import json
 import jwt
+import xmlrpc.client
+from instance.config import url, db_odoo as database, username, password
+
 
 # get products and venues
 @app.route("/products", methods=['GET'])
@@ -37,15 +40,32 @@ def add_product():
     token = tokenstr[1]
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
+        try:
+            common = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/common")
+            uid = common.authenticate(database, username, password, {})
+            models = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/object")
+            odoo_counterpart = models.execute_kw(
+                database,
+                uid,
+                password,
+                "product.template",
+                "search",
+                [
+                    [['id', '=', odoo_id]]
+                ],
+            )
+            if (odoo_counterpart == []):
+                return json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'application/json'}
+            else:
+                new_product = Product(name, price, odoo_id, start_time, end_time)
 
-        new_product = Product(name, price, odoo_id, start_time, end_time)
-
-        db.session.add(new_product)
-        db.session.commit()
-
+                db.session.add(new_product)
+                db.session.commit()
+        except exc.IntegrityError:
+            return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
+        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})    
     else:
-        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
-
+        return "You are not authorised to perform this action", 400
     return product_schema.jsonify(new_product)
 
 # update product
@@ -69,13 +89,29 @@ def update_product(Id):
             start_time = request.json["startTime"]
             end_time = request.json["endTime"]
 
-            product.name = name
-            product.price = price
-            product.odoo_id = odoo_id
-            product.start_time = start_time
-            product.end_time = end_time
+            common = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/common")
+            uid = common.authenticate(database, username, password, {})
+            models = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/object")
+            odoo_counterpart = models.execute_kw(
+                database,
+                uid,
+                password,
+                "product.template",
+                "search",
+                [
+                    [['id', '=', odoo_id]]
+                ],
+            )
+            if (odoo_counterpart == []):
+                return json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'application/json'}
+            else:
+                product.name = name
+                product.price = price
+                product.odoo_id = odoo_id
+                product.start_time = start_time
+                product.end_time = end_time
 
-            db.session.commit()
+            # db.session.commit()
         except exc.IntegrityError:
             return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
