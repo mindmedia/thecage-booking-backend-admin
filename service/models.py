@@ -3,7 +3,9 @@ from datetime import datetime
 from service import db, ma
 from marshmallow import fields
 from sqlalchemy import event
+from instance.config import admin_id, admin_password
 
+import bcrypt
 
 class Admin(db.Model):
     __tablename__ = "Admin"
@@ -35,8 +37,12 @@ admins_schema = AdminSchema(many=True)
 
 
 def insert_data(target, connection, **kw):
-    connection.execute(target.insert(), {'id': 1, 'user_id': 'admin', 'password': 'password', 'role': 'SuperAdmin'})
-
+    salt = bcrypt.gensalt()
+    superadmin_password = admin_password
+    hashed_password = bcrypt.hashpw(superadmin_password.encode("utf8"), salt)
+    superadmin_password = hashed_password.decode("utf8")
+    connection.execute(target.insert(), {'id': 1, 'user_id': admin_id, 'password': superadmin_password, 'role': 'SuperAdmin'})
+    
 
 event.listen(Admin.__table__, 'after_create', insert_data)
 
@@ -365,7 +371,9 @@ class Product(db.Model):
         "PurchaseItem", backref="product", lazy=True, cascade="all, delete")
     cart_item = db.relationship(
         "CartItem", backref="product", lazy=True, cascade="all, delete")
-
+    product_valid_day = db.relationship(
+        "ProductValidDay", backref="product", lazy=True, cascade="all, delete")
+    
     def __init__(self, name, price, odoo_id, start_time, end_time):
         self.name = name
         self.price = price
@@ -386,6 +394,24 @@ class ProductSchema(ma.Schema):
 product_schema = ProductSchema()
 products_schema = ProductSchema(many=True)
 
+class ProductValidDay(db.Model):
+    __tablename__ = "ProductValidDay"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    product_id = db.Column(db.Integer, db.ForeignKey(
+        "Product.id"), nullable=False)
+    day_of_week = db.Column(db.String(200), nullable=False)
+
+    def __init__(self, product_id, day_of_week):
+        self.product_id = product_id
+        self.day_of_week = day_of_week
+
+class ProductValidDaySchema(ma.Schema):
+    id = fields.Integer()
+    product_id = fields.Integer()
+    day_of_week = fields.String(required=True)
+
+product_valid_day_schema = ProductValidDaySchema()
+product_valid_days_schema = ProductValidDaySchema(many=True)
 
 class PromoCode(db.Model):
     __tablename__ = "PromoCode"
