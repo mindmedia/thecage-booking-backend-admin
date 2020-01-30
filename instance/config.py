@@ -1,6 +1,8 @@
-url = "***REMOVED***" # Replace url
-db = "***REMOVED***" # Replace database
-username = "***REMOVED***" # Replace username
-password = "***REMOVED***" # Replace password
-id = "7840" #Replace id
+url = ""
+db = ""
+username = ""
+password = ""
+admin_id = ""
+admin_password = ""
+id = "7840"
 DEBUG = True
