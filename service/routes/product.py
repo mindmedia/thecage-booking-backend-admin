@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from service.models import Product, products_schema, product_schema, ProductValidDay
+from service.models import Product, products_schema, product_schema, ProductValidDay, product_valid_days_schema
 from service import app
 from service import db
 from sqlalchemy import exc
@@ -57,10 +57,17 @@ def add_product():
             if (odoo_counterpart == []):
                 return json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'application/json'}
             else:
-                new_product = Product(name, price, odoo_id, start_time, end_time)
-
+                new_product = Product(name, price, odoo_id, start_time, end_time)           
                 db.session.add(new_product)
                 db.session.commit()
+
+                for i in valid_days:
+                    day_of_week = i
+                    product_id = new_product.id
+
+                    new_valid_day = ProductValidDay(product_id, day_of_week)
+                    db.session.add(new_valid_day)
+                    db.session.commit()
         except exc.IntegrityError:
             return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})    
@@ -110,7 +117,22 @@ def update_product(Id):
                 product.odoo_id = odoo_id
                 product.start_time = start_time
                 product.end_time = end_time
-
+                validproduct = ProductValidDay.query.all()
+                result = product_valid_days_schema.dump(validproduct)
+                for i in result:
+                    if i["product_id"] == product.id:
+                        product_valid_day_id = i["id"]
+                        product_valid_day = ProductValidDay.query.get(product_valid_day_id)
+                        db.session.delete(product_valid_day)
+                        db.session.commit()
+                
+                valid_days = request.json["validDay"]
+                for i in valid_days:
+                    day_of_week = i
+                    product_id = product.id
+                    new_valid_day = ProductValidDay(product_id, day_of_week)
+                    db.session.add(new_valid_day)
+                    db.session.commit()
             # db.session.commit()
         except exc.IntegrityError:
             return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
