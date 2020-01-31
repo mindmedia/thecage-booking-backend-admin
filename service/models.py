@@ -589,15 +589,17 @@ class PurchaseItem(db.Model):
         "Product.id"), nullable=False)
     field_id = db.Column(db.Integer, db.ForeignKey("Field.id"), nullable=False)
     pitch_id = db.Column(db.Integer, db.ForeignKey("Pitch.id"), nullable=False)
+    original_price = db.Column(db.Float, nullable=False)
     price = db.Column(db.Float, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, purchase_log_id, product_id, field_id, pitch_id, price, start_time, end_time):
+    def __init__(self, purchase_log_id, product_id, field_id, pitch_id, original_price, price, start_time, end_time):
         self.purchase_log_id = purchase_log_id
         self.product_id = product_id
         self.field_id = field_id
         self.pitch_id = pitch_id
+        self.original_price = original_price
         self.price = price
         self.start_time = start_time
         self.end_time = end_time
@@ -609,6 +611,7 @@ class PurchaseItemSchema(ma.Schema):
     product_id = fields.Integer()
     field_id = fields.Integer()
     pitch_id = fields.Integer()
+    original_price = fields.Float(required=True)
     price = fields.Float(required=True)
     start_time = fields.DateTime(required=True)
     end_time = fields.DateTime(required=True)
