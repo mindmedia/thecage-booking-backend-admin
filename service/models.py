@@ -406,7 +406,7 @@ class ProductSchema(ma.Schema):
     odoo_id = fields.Integer(required=True)
     start_time = fields.Time(required=True)
     end_time = fields.Time(required=True)
-    product_valid_day = fields.List(fields.Nested(ProductValidDaySchema()))
+    product_valid_day = fields.List(fields.Nested(ProductValidDaySchema(only=("id", "day_of_week"))))
 
 product_schema = ProductSchema()
 products_schema = ProductSchema(many=True)
