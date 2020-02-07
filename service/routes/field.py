@@ -6,12 +6,15 @@ from sqlalchemy import exc
 import json
 from service import db
 import jwt
+import xmlrpc.client
+from instance.config import url, db_odoo as database, username, password
+
 
 # Create new Field
 @app.route("/field/<Id>", methods=['POST'])
 def add_field(Id):
     tokenstr = request.headers["Authorization"]
-
+    odoo_id = request.json["odooId"]
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
@@ -20,27 +23,45 @@ def add_field(Id):
     role = jwt.decode(token, key, algorithms=['HS256'])["role"]
     if role == "SuperAdmin":
         try:
-            venue = Venue.query.get(Id)
-            venue_id = venue.id
-            odoo_id = request.json["odooId"]
-            name = request.json["name"]
-            field_type = request.json["fieldType"]
-            colour = request.json["colour"]
-            num_pitches = request.json["numPitches"]
-            created_at = datetime.now()
-            updated_at = datetime.now()
+            if odoo_id=="":
+                return (json.dumps({'message': 'Mandatory field \'Odoo ID\' is empty.'}), 400, {'ContentType': 'application/json'})
+            common = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/common")
+            uid = common.authenticate(database, username, password, {})
+            models = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/object")
+            odoo_counterpart = models.execute_kw(
+            database,
+                uid,
+                password,
+                "pitch_booking.venue",
+                "search",
+                [
+                    [['id', '=', odoo_id]]
+                ],
+            )
+            if (odoo_counterpart == []):
+                return (json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'application/json'})
+            else:
+                venue = Venue.query.get(Id)
+                venue_id = venue.id
+                odoo_id = request.json["odooId"]
+                name = request.json["name"]
+                field_type = request.json["fieldType"]
+                colour = request.json["colour"]
+                num_pitches = request.json["numPitches"]
+                created_at = datetime.now()
+                updated_at = datetime.now()
 
-            new_field = Field(name, venue_id, field_type, num_pitches, colour, created_at, updated_at, odoo_id)
-            db.session.add(new_field)
-            db.session.commit()
-            if int(num_pitches) >= 1:
-                for i in range(int(num_pitches)):
-                    field_id = new_field.id
-                    pitchname = "P" + str(i+1)
-                    odoo_id = None
-                    new_pitch = Pitch(pitchname, field_id, odoo_id)
-                    db.session.add(new_pitch)
-            db.session.commit()
+                new_field = Field(name, venue_id, field_type, num_pitches, colour, created_at, updated_at, odoo_id)
+                db.session.add(new_field)
+                db.session.commit()
+                if int(num_pitches) >= 1:
+                    for i in range(int(num_pitches)):
+                        field_id = new_field.id
+                        pitchname = "P" + str(i+1)
+                        odoo_id = None
+                        new_pitch = Pitch(pitchname, field_id, odoo_id)
+                        db.session.add(new_pitch)
+                db.session.commit()
         except exc.IntegrityError:
             return json.dumps({'message': "Name '" + name + "' already exists"}), 400, {'ContentType': 'application/json'}
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})

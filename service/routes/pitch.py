@@ -4,6 +4,9 @@ from service.models import Field, Pitch, pitch_schema, pitches_schema
 import json
 from service import db
 import jwt
+import xmlrpc.client
+from instance.config import url, db_odoo as database, username, password
+
 
 # Create new pitch
 @app.route("/pitch/<Id>", methods=['POST'])
@@ -51,23 +54,41 @@ def update_pitch(Id):
 
     name = request.json["name"]
     odoo_id = request.json["odooId"]
-    tokenstr = request.headers["Authorization"]
-
-    file = open("instance/key.key", "rb")
-    key = file.read()
-    file.close()
-    tokenstr = tokenstr.split(" ")
-    token = tokenstr[1]
-    role = jwt.decode(token, key, algorithms=['HS256'])["role"]
-    if role == "SuperAdmin":
-        pitch.name = name
-        pitch.odoo_id = odoo_id
-
-        db.session.commit()
-
-        return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+    if odoo_id=="":
+        return (json.dumps({'message': 'Mandatory field \'Odoo ID\' is empty.'}), 400, {'ContentType': 'application/json'})
+    common = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/common")
+    uid = common.authenticate(database, username, password, {})
+    models = xmlrpc.client.ServerProxy(f"{url}xmlrpc/2/object")
+    odoo_counterpart = models.execute_kw(
+    database,
+        uid,
+        password,
+        "pitch_booking.pitch",
+        "search",
+        [
+            [['id', '=', odoo_id]]
+        ],
+    )
+    if (odoo_counterpart == []):
+        return (json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'a>
     else:
-        return "You are not authorised to perform this action", 400
+        tokenstr = request.headers["Authorization"]
+
+        file = open("instance/key.key", "rb")
+        key = file.read()
+        file.close()
+        tokenstr = tokenstr.split(" ")
+        token = tokenstr[1]
+        role = jwt.decode(token, key, algorithms=['HS256'])["role"]
+        if role == "SuperAdmin":
+            pitch.name = name
+            pitch.odoo_id = odoo_id
+
+            db.session.commit()
+
+            return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
+        else:
+            return "You are not authorised to perform this action", 400
 
 # Delete Pitch
 @app.route("/pitch/<Id>", methods=["DELETE"])
