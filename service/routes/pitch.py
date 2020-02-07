@@ -70,7 +70,7 @@ def update_pitch(Id):
         ],
     )
     if (odoo_counterpart == []):
-        return (json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'a>
+        return (json.dumps({'message': "ID '" + str(odoo_id) + "' does not exist in Odoo"}), 400, {'ContentType': 'application/json'})
     else:
         tokenstr = request.headers["Authorization"]
 
