@@ -4,6 +4,7 @@ from service.models import TimingDiscount, timingdiscount_schema, timingdiscount
 import json
 from service import db
 import jwt
+import datetime
 
 # Create new Timing Discount
 @app.route("/discount", methods=['POST'])
@@ -34,7 +35,7 @@ def add_discount():
 @app.route("/discount/<Id>", methods=['PUT'])
 def update_discount(Id):
     tokenstr = request.headers["Authorization"]
-
+    print(datetime.date.today())
     file = open("instance/key.key", "rb")
     key = file.read()
     file.close()
@@ -48,12 +49,13 @@ def update_discount(Id):
         discount_type = request.json["discountType"]
         discount = request.json["discount"]
         status = request.json["status"]
+        date = datetime.date.today()
 
-        timingdiscount.start_time = start_time
         timingdiscount.end_time = end_time
         timingdiscount.discount_type = discount_type
         timingdiscount.discount = discount
         timingdiscount.status = status
+        timingdiscount.date = date
         db.session.commit()
 
         return (json.dumps({'message': 'success'}), 200, {'ContentType': 'application/json'})
